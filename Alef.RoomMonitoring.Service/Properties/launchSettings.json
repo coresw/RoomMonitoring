@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "Alef.RoomMonitoring.Service": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
