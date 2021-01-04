@@ -30,7 +30,7 @@ namespace Alef.RoomMonitoring.Service.ScheduledJobs
             {
                 _logger.Info($"Do CheckReservationJob at time ={DateTimeOffset.Now}");
 
-                await _reservService.CheckReservation();
+                await _reservService.CheckReservations();
             }
             catch (Exception ex)
             {

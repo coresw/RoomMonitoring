@@ -17,12 +17,6 @@ namespace Alef.RoomMonitoring.DAL.Services
     public class MSGraphAPI : IMSGraphAPI
     {
 
-        // TODO: load from config file
-        //const string URL = "https://graph.microsoft.com/";
-        //const string AUTHORITY = "https://login.microsoftonline.com/145c41ec-a970-494e-9d17-79a48d240622";
-        //const string CLIENT_ID = "61423d68-1fd7-4e93-8638-73ecf51f4455";
-        //const string CLIENT_SECRET = "9UT_etWRo1Sa7_k13Q-~76_g_4B63hzd-E";
-
         private string AccessToken;
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IConfigFileBootstrapLoader _configLoader;

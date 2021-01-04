@@ -18,10 +18,10 @@ Occupied bit
 );
 
 create table ReservationStatus(
-Id int primary key identity(1,1),
+Id int primary key,
 Name varchar(20) unique
 );
-insert into ReservationStatus(Name) values ('Planned'), ('Ongoing'), ('Past'), ('Missed');
+insert into ReservationStatus(Id, Name) values (1, 'Unchecked'), (2, 'OK'), (3, 'Notified');
 
 create table Reservation(
 Id int primary key identity(1,1),
@@ -43,10 +43,10 @@ Name varchar(30)
 );
 
 create table AttendeeType(
-Id int primary key identity(1,1),
+Id int primary key,
 Name varchar(20) unique
 );
-insert into AttendeeType(Name) values ('Organizer'), ('Required'), ('Optional');
+insert into AttendeeType(Id, Name) values (1, 'Organizer'), (2, 'Required'), (3, 'Optional');
 
 create table Attendee(
 Id int primary key identity(1,1),
@@ -54,3 +54,5 @@ PersonId int foreign key references Person(Id),
 ReservationId int foreign key references Reservation(Id),
 AttendeeTypeId int foreign key references AttendeeType(Id)
 );
+
+insert into Room(Name) values ('Test')

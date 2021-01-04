@@ -1,4 +1,5 @@
-﻿using Alef.RoomMonitoring.Configuration.Interfaces;
+﻿using Alef.RoomMonitoring.Configuration.ConfigFileSections;
+using Alef.RoomMonitoring.Configuration.Interfaces;
 using Alef.RoomMonitoring.DAL.Database.Interfaces;
 using Alef.RoomMonitoring.DAL.Model;
 using Alef.RoomMonitoring.DAL.Repository.Interfaces;
@@ -17,27 +18,32 @@ namespace Alef.RoomMonitoring.DAL.Repository
     {
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly DateTime _def_date = new DateTime();
+        private readonly DbConfiguration _config;
 
-        public ReservationRepository(IDBProvider database) : base(database)
+        public ReservationRepository(IDBProvider database, IConfigFileBootstrapLoader config) : base(database)
         {
+            _config = config.GetDbConfiguration();
         }
 
         public async Task Create(Reservation r)
         {
             try
             {
+
                 string sql = "insert into Reservation(Token, Created, Modified, TimeFrom, TimeTo, Name, Body, ReservationStatusID, RoomID) values (" +
                     "'" + r.Token + "'" +
-                    ",'" + r.Created.ToString("yyyy-MM-ddTHH:mm:ss") + "'" +
-                    ",'" + r.Modified.ToString("yyyy-MM-ddTHH:mm:ss") + "'" +
-                    ",'" + r.TimeFrom.ToString("yyyy-MM-ddTHH:mm:ss") + "'" +
-                    ",'" + r.TimeTo.ToString("yyyy-MM-ddTHH:mm:ss") + "'" +
+                    ",'" + (r.Created==_def_date ? null :r.Created.ToString(_config.DateFormat)) + "'" +
+                    ",'" + (r.Modified == _def_date ? null : r.Modified.ToString(_config.DateFormat)) + "'" +
+                    ",'" + (r.TimeFrom == _def_date ? null : r.TimeFrom.ToString(_config.DateFormat)) + "'" +
+                    ",'" + (r.TimeTo == _def_date ? null : r.TimeTo.ToString(_config.DateFormat)) + "'" +
                     ",'" + r.Name + "'" +
                     ",'" + r.Body + "'" +
                     ",'" + r.ReservationStatusId + "'" +
                     ",'" + r.RoomId + "'" +
                     ")";
                 await Database.ExecuteAsync(sql);
+                r.Id = (await GetByToken(r.Token)).Id;
             }
             catch (Exception e)
             {
@@ -90,6 +96,20 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
+        public async Task<IEnumerable<Reservation>> GetWhere(string condition)
+        {
+            try
+            {
+                string sql = "select * from Reservation where " + condition + "";
+                return await Database.ExecuteQueryAsync<Reservation>(sql);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e.Demystify(), "Failed querying from table Reservation");
+                throw;
+            }
+        }
+
         public async Task<Reservation> GetById(int id)
         {
             try
@@ -112,10 +132,10 @@ namespace Alef.RoomMonitoring.DAL.Repository
             try
             {
                 string sql = "update Reservation set " +
-                    "Created='" + r.Created + "'" +
-                    ",Modified='" + r.Modified + "'" +
-                    ",TimeFrom='" + r.TimeFrom + "'" +
-                    ",TimeTo='" + r.TimeTo + "'" +
+                    "Created='" + (r.Created == _def_date ? null : r.Created.ToString(_config.DateFormat)) + "'" +
+                    ",Modified='" + (r.Modified == _def_date ? null : r.Modified.ToString(_config.DateFormat)) + "'" +
+                    ",TimeFrom='" + (r.TimeFrom == _def_date ? null : r.TimeFrom.ToString(_config.DateFormat)) + "'" +
+                    ",TimeTo='" + (r.TimeTo == _def_date ? null : r.TimeTo.ToString(_config.DateFormat)) + "'" +
                     ",Name='" + r.Name + "'" +
                     ",Body='" + r.Body + "'" +
                     ",ReservationStatusId='" + r.ReservationStatusId + "'" +

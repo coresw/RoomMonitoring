@@ -28,6 +28,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
                     ",'" + a.AttendeeTypeId + "'" +
                     ")";
                 await Database.ExecuteAsync(sql);
+                a.Id = (await GetByPersonReservation(a.PersonId, a.ReservationId)).Id;
             }
             catch (Exception e)
             {

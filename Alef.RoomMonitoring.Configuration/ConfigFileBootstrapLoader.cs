@@ -36,9 +36,11 @@ namespace Alef.RoomMonitoring.Configuration
 
             var local = new DbConfiguration()
             {
+                Server = "localhost",
                 DbName = "RoomMonitoring",
                 ConfigTableName = String.Empty,
                 UseWindowsAuthentication = true,
+                DateFormat = "yyyy-MM-ddTHH:mm:ss",
             };
 
             return local;

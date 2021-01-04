@@ -31,6 +31,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
                     "'" + p.EMail + "'" +
                     ")";
                 await Database.ExecuteAsync(sql);
+                p.Id = (await GetByEMail(p.EMail)).Id;
             }
             catch (Exception e)
             {

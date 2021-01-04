@@ -20,7 +20,7 @@ namespace Alef.RoomMonitoring.DAL.Services
             _graphAPI = graphAPI;
         }
 
-        public async Task<IEnumerable<OReservation>> GetReservations()
+        public async Task<IEnumerable<OReservation>> GetReservationsAsync()
         {
             try
             {
@@ -29,7 +29,7 @@ namespace Alef.RoomMonitoring.DAL.Services
                 //vrati kolekci OReservation tzn. pres graphAPI ziska odpoved z O365
                 //Data z O365 rozparsovat a dat do kolekce
 
-                Dictionary<string, OUser> users = await getUsers();
+                Dictionary<string, OUser> users = await getUsersAsync();
 
                 Dictionary<string, OReservation> res = new Dictionary<string, OReservation>(); // all reservations, uniquely identified by their IDs
 
@@ -81,7 +81,7 @@ namespace Alef.RoomMonitoring.DAL.Services
             }
         }
 
-        private async Task<Dictionary<string, OUser>> getUsers()
+        private async Task<Dictionary<string, OUser>> getUsersAsync()
         {
             try
             {

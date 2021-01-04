@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Alef.RoomMonitoring.Service.Services.Interfaces
 {
-    public interface ICheckReservationService
+    interface IRoomStatusSyncService
     {
-        Task CheckReservations();
+        Task SyncRooms();
     }
 }

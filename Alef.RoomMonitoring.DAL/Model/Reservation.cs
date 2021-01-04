@@ -15,12 +15,12 @@ namespace Alef.RoomMonitoring.DAL.Model
         public DateTime TimeTo { get; set; }
         public string Name { get; set; }
         public string Body { get; set; }
-        public int ReservationStatusId { get; set; }
-        public int RoomId { get; set; }
+        public int ReservationStatusId { get; set; } = 1;
+        public int RoomId { get; set; } = 1;
 
         public override string ToString()
         {
-            return Name + " " + TimeFrom + " " + TimeTo + " " + " " + Body;
+            return Name + " " + Body + " " + Created + " " + Modified + " " + TimeFrom + " " + TimeTo;
         }
 
     }

@@ -16,33 +16,33 @@ namespace Alef.RoomMonitoring.DAL.Database
 
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private SqlConnection connection;
-        private string connectionString;
+        private SqlConnection _connection;
+        private string _connectionString;
 
         public DBProvider(IConnectionStringProvider connectionStringProvider) {
 
-            this.connectionString = connectionStringProvider.Value;
+            this._connectionString = connectionStringProvider.Value;
 
         }
 
         private SqlConnection getConnection() {
 
-            if (connection == null) {
+            if (_connection == null) {
 
                 try
                 {
-                    connection = new SqlConnection(connectionString);
-                    connection.Open();
+                    _connection = new SqlConnection(_connectionString);
+                    _connection.Open();
                 }
                 catch (Exception e)
                 {
-                    _logger.Error(e.Demystify(), "Failed connecting to database (Connection string="+connectionString+")");
+                    _logger.Error(e.Demystify(), "Failed connecting to database (Connection string="+_connectionString+")");
                     throw;
                 }
 
             }
 
-            return connection;
+            return _connection;
 
         }
 
@@ -87,10 +87,10 @@ namespace Alef.RoomMonitoring.DAL.Database
 
         public void Close() {
 
-            if (connection != null) {
+            if (_connection != null) {
                 try
                 {
-                    connection.Close();
+                    _connection.Close();
                 }
                 catch (Exception e)
                 {
