@@ -31,9 +31,11 @@ namespace Alef.RoomMonitoring.Service.Services
 
         public async Task SyncReservations()
         {
+
+            _logger.Info("Syncing reservations...");
+
             try
             {
-                _logger.Info("GetNewReservation started...");
 
                 int reservations = 0, persons = 0, attendees = 0;
 
@@ -63,7 +65,7 @@ namespace Alef.RoomMonitoring.Service.Services
 
                     // TODO: office query condition
                     if (or.TimeTo < DateTime.Now || or.TimeFrom >= DateTime.Today.AddDays(1))
-                        continue; // skip if already ended or starting next day or later
+                        ;//continue; // skip if already ended or starting next day or later
 
                     Reservation dbr = await _reservRepo.GetByToken(or.Id);
 

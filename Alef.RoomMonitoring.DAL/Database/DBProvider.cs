@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Alef.RoomMonitoring.DAL.Database
@@ -19,9 +20,11 @@ namespace Alef.RoomMonitoring.DAL.Database
         private SqlConnection _connection;
         private string _connectionString;
 
+        private bool _busy;
+
         public DBProvider(IConnectionStringProvider connectionStringProvider) {
 
-            this._connectionString = connectionStringProvider.Value;
+            _connectionString = connectionStringProvider.Value;
 
         }
 
@@ -42,6 +45,13 @@ namespace Alef.RoomMonitoring.DAL.Database
 
             }
 
+            // TODO: replace w/ connection pool
+            while (_busy)
+            {
+                Thread.Sleep(10); // thread safety - only one command at once
+                _logger.Info("Database is busy! Request queued");
+            }
+
             return _connection;
 
         }
@@ -50,7 +60,11 @@ namespace Alef.RoomMonitoring.DAL.Database
         {
             try
             {
-                return await getConnection().ExecuteAsync(sql);
+                var conn = getConnection();
+                _busy = true;
+                var res = await conn.ExecuteAsync(sql);
+                _busy = false;
+                return res;
             }
             catch (Exception e)
             {
@@ -63,7 +77,11 @@ namespace Alef.RoomMonitoring.DAL.Database
         {
             try
             {
-                return await getConnection().QueryAsync<T>(sql);
+                var conn = getConnection();
+                _busy = true;
+                var res = await conn.QueryAsync<T>(sql);
+                _busy = false;
+                return res;
             }
             catch (Exception e)
             {
@@ -76,7 +94,11 @@ namespace Alef.RoomMonitoring.DAL.Database
         {
             try
             {
-                return await getConnection().ExecuteScalarAsync<T>(sql);
+                var conn = getConnection();
+                _busy = true;
+                var res = await conn.ExecuteScalarAsync<T>(sql);
+                _busy = false;
+                return res;
             }
             catch (Exception e)
             {

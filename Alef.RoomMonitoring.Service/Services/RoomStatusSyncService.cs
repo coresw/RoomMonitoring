@@ -1,5 +1,6 @@
 ﻿using Alef.RoomMonitoring.DAL.Model;
 using Alef.RoomMonitoring.DAL.Repository;
+using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using Alef.RoomMonitoring.Service.Services.Interfaces;
 using CiscoEndpointProvider;
 using NLog;
@@ -15,16 +16,18 @@ namespace Alef.RoomMonitoring.Service.Services
     {
 
         private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-        private readonly RoomRepository _roomRepo;
+        private readonly IRoomRepository _roomRepo;
         private readonly IEndpointProvider _endpoint;
 
-        public RoomStatusSyncService(RoomRepository roomRepo, IEndpointProvider endpoint) {
+        public RoomStatusSyncService(IRoomRepository roomRepo, IEndpointProvider endpoint) {
             _roomRepo = roomRepo;
             _endpoint = endpoint;
         }
 
         public async Task SyncRooms()
         {
+
+            _logger.Info("Syncing rooms...");
 
             try
             {
@@ -38,6 +41,8 @@ namespace Alef.RoomMonitoring.Service.Services
                     await _roomRepo.Update(room);
 
                 }
+
+                _logger.Info("SyncRooms done!");
 
             }
             catch (Exception e) {

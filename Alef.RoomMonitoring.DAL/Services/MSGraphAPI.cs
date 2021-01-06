@@ -59,12 +59,14 @@ namespace Alef.RoomMonitoring.DAL.Services
                 }
                 catch (Exception e) 
                 {
+                    Console.WriteLine(e);
                     _logger.Error(e.Demystify(), $"Failed parsing response: "+e.Message);
                     throw;
                 }
             }
             else
             {
+                Console.WriteLine(response.StatusCode);
                 _logger.Error($"Failed calling API: status={response.StatusCode}");
                 return null;
             }

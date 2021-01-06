@@ -37,16 +37,16 @@ namespace Alef.RoomMonitoring.Service.Services
 
         public async Task CheckReservations()
         {
+
+            _logger.Info("Checking reservations...");
+
             try
             {
 
                 //Nacist rezervace z DB. Nacitaji se pouze rezervace, ktere nebyly jiz zpracovany tj. notifikovany atd.
 
-                IEnumerable<Reservation> reservations = await _reservRepo.GetWhere(
-                    "ReservationStatusId="+ReservationStatus.UNCHECKED.Id+
-                    " and TimeFrom<'"+DateTime.Now.ToString(_dbConf.DateFormat)+"'" +
-                    " and TimeTo<'"+DateTime.Today.AddDays(1).ToString(_dbConf.DateFormat)
-                    );
+                IEnumerable<Reservation> reservations = await _reservRepo.GetWhere(reservationStatusId: ReservationStatus.UNCHECKED.Id,
+                    timeFrom: DateTime.Now, timeTo: DateTime.Today.AddDays(1));
 
                 foreach (Reservation r in reservations) {
 
@@ -65,6 +65,8 @@ namespace Alef.RoomMonitoring.Service.Services
                     await _reservRepo.Update(r);
 
                 }
+
+                _logger.Info("Checking reservations done!");
 
             }
             catch (Exception ex)

@@ -15,9 +15,10 @@ namespace Alef.RoomMonitoring.Service.ScheduledJobs
     /// </summary>
     public class CheckReservationJob : ICheckReservationJob
     {
+        public static string JobName { get => "CheckReservationJob"; }
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-        private readonly ICheckReservationService _reservService;
 
+        private readonly ICheckReservationService _reservService;
 
         public CheckReservationJob(ICheckReservationService reservService)
         {
@@ -28,13 +29,12 @@ namespace Alef.RoomMonitoring.Service.ScheduledJobs
         {
             try
             {
-                _logger.Info($"Do CheckReservationJob at time ={DateTimeOffset.Now}");
-
+                
                 await _reservService.CheckReservations();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw;
+                _logger.Error("CheckReservationJob failed: "+e.Message);
             }
         }
     }

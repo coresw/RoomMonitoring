@@ -11,16 +11,24 @@ namespace Alef.RoomMonitoring.Configuration
     {
         public IList<JobSetting> GetJobSettings()
         {
-            JobSetting job1 = new JobSetting() {
-                Name= "GetRoomReservationJob",
-                Enabled=true,
-                SimpleTriggerTime = 300
+
+            return new List<JobSetting> {
+                new JobSetting() {
+                    Name= "CheckReservationJob",
+                    Enabled=true,
+                    SimpleTriggerTime = 300
+                },
+                new JobSetting() {
+                    Name= "ReservationSyncJob",
+                    Enabled=true,
+                    SimpleTriggerTime = 300
+                },
+                new JobSetting() {
+                    Name= "RoomStatusSyncJob",
+                    Enabled=true,
+                    SimpleTriggerTime = 300
+                },
             };
-
-            IList<JobSetting> result = new List<JobSetting>();
-            result.Add(job1);
-
-            return (result);
         }
 
         public DbConfiguration GetDbConfiguration()

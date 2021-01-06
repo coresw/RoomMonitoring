@@ -19,10 +19,7 @@ namespace Alef.RoomMonitoring.DAL
 
             MSGraphAPI api = new MSGraphAPI(new ConfigFileBootstrapLoader());
 
-            var allcompany = "22427154-347c-476c-9e16-ca6b2f07d5b2";
-            var sqertx = "923a8e5f-88f2-4b8c-bcaa-23f8b8897a84";
-
-            Console.WriteLine(api.SendRequestAsync("/groups/"+sqertx+"/calendar").Result);
+            Console.WriteLine(api.SendRequestAsync("/places/microsoft.graph.room").Result);
 
             /*MSGraphProvider prov = new MSGraphProvider(api);
 

@@ -1,12 +1,17 @@
 using Alef.RoomMonitoring.Configuration;
 using Alef.RoomMonitoring.Configuration.Interfaces;
 using Alef.RoomMonitoring.Configuration.Model;
+using Alef.RoomMonitoring.DAL.Database;
+using Alef.RoomMonitoring.DAL.Database.Interfaces;
 using Alef.RoomMonitoring.DAL.Repository;
 using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using Alef.RoomMonitoring.DAL.Services;
 using Alef.RoomMonitoring.DAL.Services.Interfaces;
 using Alef.RoomMonitoring.Service.ScheduledJobs;
 using Alef.RoomMonitoring.Service.ScheduledJobs.Interfaces;
+using Alef.RoomMonitoring.Service.Services;
+using Alef.RoomMonitoring.Service.Services.Interfaces;
+using CiscoEndpointProvider;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
@@ -34,9 +39,10 @@ namespace Alef.RoomMonitoring.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+
             _logger.Info("RoomMonitoringWorker running at: {time}", DateTimeOffset.Now);
 
-            StartJobs();
+            ScheduleJobs();
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -44,10 +50,14 @@ namespace Alef.RoomMonitoring.Service
             }
 
             _logger.Info("RoomMonitoring service stopped");
+
         }
 
-        private async void StartJobs()
+        private async void ScheduleJobs()
         {
+
+            _logger.Info("Scheduling jobs...");
+
             try
             {
                 var serviceProvider = GetConfiguredServiceProvider();
@@ -58,43 +68,42 @@ namespace Alef.RoomMonitoring.Service
                 _scheduler.JobFactory = new MonitoringJobFactory(serviceProvider);
                 await _scheduler.Start();
 
-                await ScheduleGetRoomReservationJob(jobSettings);
-                await ScheduleCheckReservationJob(jobSettings);
+                await ScheduleJob<IReservationSyncJob>(jobSettings, ReservationSyncJob.JobName);
+                await ScheduleJob<IRoomStatusSyncJob>(jobSettings, RoomStatusSyncJob.JobName);
+                await ScheduleJob<ICheckReservationJob>(jobSettings, CheckReservationJob.JobName);
 
-                _logger.Info("RoomMonitoring service - all jobs started.....");
+                _logger.Info("ScheduleJobs done!");
+
             }
             catch (Exception ex)
             {
-                _logger.Error("Unexpected error");
-                throw ex;
+                _logger.Error("Failed scheduling jobs: "+ex);
+                throw;
             }
         }
 
-        private async Task ScheduleGetRoomReservationJob(IList<JobSetting> settings)
+        private async Task ScheduleJob<T>(IList<JobSetting> settings, string name) where T: IJob
         {
-            JobSetting js = settings.FirstOrDefault(x => x.Name == "GetRoomReservationJob");
+
+            JobSetting js = settings.FirstOrDefault(x => x.Name == name);
 
             if (js == null)
-                throw new ArgumentNullException("Config.xml does not containg job configuration for ProductModify job ");
+                throw new Exception("No config found for "+name+"!");
 
             if (js.Enabled)
             {
-                IJobDetail job = JobBuilder.Create<IGetRoomReservationJob>()
-                                .WithIdentity(GetRoomReservationJob.JobName)
+                
+                IJobDetail job = JobBuilder.Create<T>()
+                                .WithIdentity(name)
                                 .Build();
 
                 await _scheduler.ScheduleJob(job, GetTrigger(js));
 
-                _logger.Info("ScheduleProductModifyJob scheduled");
             }
             else
             {
-                _logger.Info("ScheduleProductModifyJob was not enabled");
+                _logger.Warn(name+" is disabled - Will not be scheduled!");
             }
-        }
-
-        private async Task ScheduleCheckReservationJob(IList<JobSetting> settings)
-        { 
         }
 
         private ITrigger GetTrigger(JobSetting setting)
@@ -109,7 +118,7 @@ namespace Alef.RoomMonitoring.Service
                 trigger = CreateOnTimeTrigger(setting.TriggerTimeValue.Hour.Value, setting.TriggerTimeValue.Minute.Value, setting.Name);
             }
             else
-                throw new ArgumentException("Wrong job configuration");
+                throw new Exception("Invalid job configuration!");
 
             return (trigger);
         }
@@ -141,15 +150,26 @@ namespace Alef.RoomMonitoring.Service
         {
             var services = new ServiceCollection()
                 .AddSingleton<IConfigFileBootstrapLoader, ConfigFileBootstrapLoader>()
+
+                .AddSingleton<IMSGraphProvider, MSGraphProvider>()
+                .AddSingleton<IEndpointProvider, MockEndpointProvider>()
+                .AddSingleton<IDBProvider, DBProvider>()
                 .AddSingleton<IConnectionStringProvider, ConnectionStringProvider>()
-                .AddScoped<IPersonRepository, PersonRepository>()
-                .AddScoped<IAttendeeRepository, AttendeeRepository>()
-                .AddScoped<IRoomRepository, RoomRepository>()
-                .AddScoped<IReservationRepository, ReservationRepository>()
-                .AddScoped<IAttendeeTypeRepository, AttendeeTypeRepository>()
-                .AddScoped<IMSGraphAPI, MSGraphAPI>()
-                .AddScoped<IGetRoomReservationJob, GetRoomReservationJob>()
-                .AddScoped<ICheckReservationJob, CheckReservationJob>()
+                .AddSingleton<IMSGraphAPI, MSGraphAPI>()
+
+                .AddSingleton<IReservationRepository, ReservationRepository>()
+                .AddSingleton<IRoomRepository, RoomRepository>()
+                .AddSingleton<IPersonRepository, PersonRepository>()
+                .AddSingleton<IAttendeeRepository, AttendeeRepository>()
+
+                .AddSingleton<ICheckReservationService, CheckReservationService>()
+                .AddSingleton<IReservationSyncService, ReservationSyncService>()
+                .AddSingleton<IRoomStatusSyncService, RoomStatusSyncService>()
+
+                .AddSingleton<ICheckReservationJob, CheckReservationJob>()
+                .AddSingleton<IReservationSyncJob, ReservationSyncJob>()
+                .AddSingleton<IRoomStatusSyncJob, RoomStatusSyncJob>()
+
                 .AddLogging();
 
             return services.BuildServiceProvider();

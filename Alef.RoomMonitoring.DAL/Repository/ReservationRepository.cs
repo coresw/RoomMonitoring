@@ -33,7 +33,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
 
                 string sql = "insert into Reservation(Token, Created, Modified, TimeFrom, TimeTo, Name, Body, ReservationStatusID, RoomID) values (" +
                     "'" + r.Token + "'" +
-                    ",'" + (r.Created==_def_date ? null :r.Created.ToString(_config.DateFormat)) + "'" +
+                    ",'" + (r.Created==_def_date ? null : r.Created.ToString(_config.DateFormat)) + "'" +
                     ",'" + (r.Modified == _def_date ? null : r.Modified.ToString(_config.DateFormat)) + "'" +
                     ",'" + (r.TimeFrom == _def_date ? null : r.TimeFrom.ToString(_config.DateFormat)) + "'" +
                     ",'" + (r.TimeTo == _def_date ? null : r.TimeTo.ToString(_config.DateFormat)) + "'" +
@@ -96,11 +96,24 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<IEnumerable<Reservation>> GetWhere(string condition)
+        public async Task<IEnumerable<Reservation>> GetWhere(string token = null, DateTime created = new DateTime(),
+            DateTime modified = new DateTime(), DateTime timeFrom = new DateTime(), DateTime timeTo = new DateTime(), string name = null,
+            string body = null, int reservationStatusId = -1, int roomId = -1)
         {
             try
             {
-                string sql = "select * from Reservation where " + condition + "";
+
+                string sql = "select * from Reservation where id>0"+
+                    (token==null?"":(" and Token='"+token+"'"))+
+                    (created==_def_date?"":(" and Created='" + created.ToString(_config.DateFormat) + "'")) +
+                    (modified==_def_date?"":(" and Modified='" + modified.ToString(_config.DateFormat) + "'")) +
+                    (timeFrom==_def_date?"":(" and TimeFrom='" + timeFrom.ToString(_config.DateFormat) + "'")) +
+                    (timeTo==_def_date?"":(" and TimeTo='" + timeTo.ToString(_config.DateFormat) + "'")) +
+                    (name==null?"":(" and Name='" + name + "'")) +
+                    (body==null?"":(" and Body='" + body + "'")) +
+                    (reservationStatusId<=0?"":(" and ReservationStatusId='" + reservationStatusId + "'")) +
+                    (roomId<=0?"":(" and RoomId='" + roomId + "'"))
+                    ;
                 return await Database.ExecuteQueryAsync<Reservation>(sql);
             }
             catch (Exception e)

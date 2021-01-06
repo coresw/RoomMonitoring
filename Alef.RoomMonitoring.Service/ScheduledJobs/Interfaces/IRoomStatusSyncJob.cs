@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Alef.RoomMonitoring.Service.ScheduledJobs.Interfaces
 {
-    public interface IGetRoomReservationJob : IJob
+    interface IRoomStatusSyncJob: IJob
     {
     }
 }
