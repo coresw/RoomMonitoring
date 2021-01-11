@@ -23,9 +23,10 @@ namespace Alef.RoomMonitoring.DAL.Repository
         {
             try
             {
-                string sql = "insert into Room(Name, Occupied) values (" +
+                string sql = "insert into Room(Name, EMail, EndpointIP) values (" +
                     "'" + r.Name + "'" +
-                    ",'" + r.Occupied + "'" +
+                    ",'" + r.EMail + "'" +
+                    ",'" + r.EndpointIP + "'" +
                     ")";
                 await Database.ExecuteAsync(sql);
             }
@@ -41,7 +42,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
             try
             {
                 string sql = "delete from Room where " +
-                    "Name='" + r.Name + "'";
+                    "EMail='" + r.EMail + "'";
                 await Database.ExecuteAsync(sql);
             }
             catch (Exception e)
@@ -64,12 +65,12 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<Room> GetByName(string name)
+        public async Task<Room> GetByEMail(string email)
         {
             try
             {
                 string sql = "select * from Room where " +
-                    "Name='" + name + "'";
+                    "EMail='" + email + "'";
                 IEnumerator<Room> query = (await Database.ExecuteQueryAsync<Room>(sql)).GetEnumerator();
                 if (!query.MoveNext())
                     return null;
@@ -104,8 +105,9 @@ namespace Alef.RoomMonitoring.DAL.Repository
             try
             {
                 string sql = "update Room set " +
-                    "Occupied='" + r.Occupied + "'" +
-                    " where Name='" + r.Name + "'";
+                    "Name='" + r.Name + "'" +
+                    ", EndpointIP='" + r.EndpointIP + "'" +
+                    " where EMail='" + r.EMail + "'";
                 await Database.ExecuteAsync(sql);
             }
             catch (Exception e)

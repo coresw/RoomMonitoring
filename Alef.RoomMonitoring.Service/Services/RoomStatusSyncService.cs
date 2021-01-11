@@ -27,28 +27,28 @@ namespace Alef.RoomMonitoring.Service.Services
         public async Task SyncRooms()
         {
 
-            _logger.Info("Syncing rooms...");
+            //_logger.Info("Syncing rooms...");
 
-            try
-            {
+            //try
+            //{
 
-                IEnumerable<Room> rooms = await _roomRepo.GetAll();
+            //    IEnumerable<Room> rooms = await _roomRepo.GetAll();
 
-                foreach (Room room in rooms) {
+            //    foreach (Room room in rooms) {
 
-                    room.Occupied = _endpoint.GetPeopleCount(room.EndpointIP)>0;
+            //        room.Occupied = _endpoint.GetPeopleCount(room.EndpointIP)>0;
 
-                    await _roomRepo.Update(room);
+            //        await _roomRepo.Update(room);
 
-                }
+            //    }
 
-                _logger.Info("SyncRooms done!");
+            //    _logger.Info("SyncRooms done!");
 
-            }
-            catch (Exception e) {
-                _logger.Error(e.Demystify(), "Failed syncing room status: "+e);
-                throw;
-            }
+            //}
+            //catch (Exception e) {
+            //    _logger.Error(e.Demystify(), "Failed syncing room status: "+e);
+            //    throw;
+            //}
 
         }
 

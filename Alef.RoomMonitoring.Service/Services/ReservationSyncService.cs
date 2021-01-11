@@ -39,7 +39,7 @@ namespace Alef.RoomMonitoring.Service.Services
 
                 int reservations = 0, persons = 0, attendees = 0;
 
-                var oReservations = await _graphProvider.GetReservationsAsync();
+                var oReservations = await _graphProvider.GetUpcomingRoomReservations("");
                 var dbReservations = await _reservRepo.GetAll();
 
                 //Pro vsechny mistnosti (dane v DB ciselniku)

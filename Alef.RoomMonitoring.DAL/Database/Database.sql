@@ -12,9 +12,9 @@ drop table if exists Room;
 
 create table Room(
 Id int primary key identity(1,1),
-Name varchar(25) unique,
+Name varchar(25),
+EMail varchar(25) unique,
 EndpointIP varchar(40),
-Occupied bit
 );
 
 create table ReservationStatus(
@@ -54,5 +54,3 @@ PersonId int foreign key references Person(Id),
 ReservationId int foreign key references Reservation(Id),
 AttendeeTypeId int foreign key references AttendeeType(Id)
 );
-
-insert into Room(Name) values ('Test')

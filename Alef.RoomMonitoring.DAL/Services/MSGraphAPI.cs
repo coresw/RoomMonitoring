@@ -66,7 +66,7 @@ namespace Alef.RoomMonitoring.DAL.Services
             }
             else
             {
-                Console.WriteLine(response.StatusCode);
+                Console.WriteLine(response.StatusCode+"\n"+content);
                 _logger.Error($"Failed calling API: status={response.StatusCode}");
                 return null;
             }

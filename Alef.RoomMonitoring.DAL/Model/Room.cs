@@ -9,12 +9,12 @@ namespace Alef.RoomMonitoring.DAL.Model
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public string EMail { get; set; }
         public string EndpointIP { get; set; }
-        public bool Occupied { get; set; }
 
         public override string ToString()
         {
-            return Name + " " + Occupied;
+            return Name + " " + EMail;
         }
 
     }

@@ -8,6 +8,6 @@ namespace Alef.RoomMonitoring.DAL.Services.Interfaces
 {
     public interface IMSGraphProvider
     {
-        Task<IEnumerable<OReservation>> GetReservationsAsync();
+        Task<IEnumerable<OReservation>> GetUpcomingRoomReservations(string roomEmail);
     }
 }

@@ -50,7 +50,8 @@ namespace Alef.RoomMonitoring.Service.Services
 
                 foreach (Reservation r in reservations) {
 
-                    bool occupied = _roomRepo.GetById(r.RoomId).Result.Occupied;
+                    //bool occupied = _roomRepo.GetById(r.RoomId).Result.Occupied;
+                    bool occupied = false; // TODO: realtime
 
                     if (occupied)
                     {

@@ -10,7 +10,7 @@ namespace Alef.RoomMonitoring.DAL.Repository.Interfaces
     {
         Task Create(Room r);
         Task<Room> GetById(int id);
-        Task<Room> GetByName(string name);
+        Task<Room> GetByEMail(string email);
         Task<IEnumerable<Room>> GetAll();
         Task Update(Room r);
         Task Delete(Room r);
