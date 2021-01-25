@@ -17,26 +17,19 @@ namespace Alef.RoomMonitoring.DAL.Services
     public class MSGraphAPI : IMSGraphAPI
     {
 
-        private string AccessToken;
+        private string _accessToken;
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IConfigFileBootstrapLoader _configLoader;
-
-        #region Ctor
 
         public MSGraphAPI(IConfigFileBootstrapLoader configLoader) 
         {
             _configLoader = configLoader;
         }
 
-        #endregion
-
         public async Task<JObject> SendRequestAsync(string request) 
         {
 
-            if (AccessToken == null) 
-            {
-                authenticate();
-            }
+            string accessToken = GetAccessToken();
 
             var setting = _configLoader.GetMSGraphSetting();
 
@@ -45,7 +38,7 @@ namespace Alef.RoomMonitoring.DAL.Services
             HttpClient client = new HttpClient();
 
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", AccessToken);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
 
             HttpResponseMessage response = await client.GetAsync(url);
 
@@ -60,38 +53,45 @@ namespace Alef.RoomMonitoring.DAL.Services
                 catch (Exception e) 
                 {
                     Console.WriteLine(e);
-                    _logger.Error(e.Demystify(), $"Failed parsing response: "+e.Message);
+                    _logger.Error(e.Demystify(), "Failed parsing response");
                     throw;
                 }
             }
             else
             {
-                Console.WriteLine(response.StatusCode+"\n"+content);
-                _logger.Error($"Failed calling API: status={response.StatusCode}");
-                return null;
+                _logger.Error(response.StatusCode+" "+content);
+                throw new Exception("Failed processing request: "+response.StatusCode+" "+content);
             }
 
         }
 
-        private void authenticate() 
+        private string GetAccessToken() 
         {
             try
             {
-                var setting = _configLoader.GetMSGraphSetting();
 
-                IConfidentialClientApplication authenticator = ConfidentialClientApplicationBuilder
-                        .Create(setting.ClientID)
-                        .WithClientSecret(setting.ClientSecret)
-                        .WithAuthority(setting.Authority)
-                        .Build();
+                if (_accessToken == null)
+                {
 
-                AuthenticationResult result;
+                    var setting = _configLoader.GetMSGraphSetting();
+
+                    IConfidentialClientApplication authenticator = ConfidentialClientApplicationBuilder
+                            .Create(setting.ClientID)
+                            .WithClientSecret(setting.ClientSecret)
+                            .WithAuthority(setting.Authority)
+                            .Build();
+
+                    AuthenticationResult result;
                     result = authenticator.AcquireTokenForClient(new string[] { setting.Url + ".default" }).ExecuteAsync().Result;
-                    AccessToken = result.AccessToken;
+                    _accessToken = result.AccessToken;
+
+                }
+
+                return _accessToken;
             }
             catch(Exception ex)
             {
-                _logger.Error(ex.Demystify(), $"Failed acquiring auth token: ex={ex.Message}");
+                _logger.Error(ex.Demystify(), "Authentication failed");
                 throw;
             }
         }

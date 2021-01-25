@@ -96,24 +96,12 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<IEnumerable<Reservation>> GetWhere(string token = null, DateTime created = new DateTime(),
-            DateTime modified = new DateTime(), DateTime timeFrom = new DateTime(), DateTime timeTo = new DateTime(), string name = null,
-            string body = null, int reservationStatusId = -1, int roomId = -1)
+        public async Task<IEnumerable<Reservation>> GetWhere(string query)
         {
             try
             {
 
-                string sql = "select * from Reservation where id>0"+
-                    (token==null?"":(" and Token='"+token+"'"))+
-                    (created==_def_date?"":(" and Created='" + created.ToString(_config.DateFormat) + "'")) +
-                    (modified==_def_date?"":(" and Modified='" + modified.ToString(_config.DateFormat) + "'")) +
-                    (timeFrom==_def_date?"":(" and TimeFrom='" + timeFrom.ToString(_config.DateFormat) + "'")) +
-                    (timeTo==_def_date?"":(" and TimeTo='" + timeTo.ToString(_config.DateFormat) + "'")) +
-                    (name==null?"":(" and Name='" + name + "'")) +
-                    (body==null?"":(" and Body='" + body + "'")) +
-                    (reservationStatusId<=0?"":(" and ReservationStatusId='" + reservationStatusId + "'")) +
-                    (roomId<=0?"":(" and RoomId='" + roomId + "'"))
-                    ;
+                string sql = "select * from Reservation where " + query;
                 return await Database.ExecuteQueryAsync<Reservation>(sql);
             }
             catch (Exception e)

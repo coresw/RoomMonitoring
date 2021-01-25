@@ -4,19 +4,21 @@ using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alef.RoomMonitoring.Test
+namespace Alef.RoomMonitoring.Test.Repository
 {
     [TestClass]
-    public class PersonRepositoryTest : TestBase
+    public class ReservationRepositoryTest : TestBase
     {
         [TestMethod]
-        public async Task TestMethod1()
+        public async Task TestGet()
         {
-            var persRepo = serviceProvider.GetService<IPersonRepository>();
 
-            var result = await persRepo.GetAll();
+            var repo = serviceProvider.GetService<IReservationRepository>();
+
+            var result = await repo.GetAll();
 
             Assert.IsNotNull(result);
+
         }
     }
 }

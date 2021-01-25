@@ -48,7 +48,7 @@ namespace Alef.RoomMonitoring.Configuration
                 DbName = "RoomMonitoring",
                 ConfigTableName = String.Empty,
                 UseWindowsAuthentication = true,
-                DateFormat = "yyyy-MM-ddTHH:mm:ss",
+                DateFormat = "yyyy-MM-ddTHH:mm:ssZ",
             };
 
             return local;

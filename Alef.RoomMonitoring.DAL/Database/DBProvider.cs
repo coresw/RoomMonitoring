@@ -28,7 +28,7 @@ namespace Alef.RoomMonitoring.DAL.Database
 
         }
 
-        private SqlConnection getConnection() {
+        private SqlConnection GetConnection() {
 
             if (_connection == null) {
 
@@ -45,7 +45,6 @@ namespace Alef.RoomMonitoring.DAL.Database
 
             }
 
-            // TODO: replace w/ connection pool
             while (_busy)
             {
                 Thread.Sleep(10); // thread safety - only one command at once
@@ -60,7 +59,7 @@ namespace Alef.RoomMonitoring.DAL.Database
         {
             try
             {
-                var conn = getConnection();
+                var conn = GetConnection();
                 _busy = true;
                 var res = await conn.ExecuteAsync(sql);
                 _busy = false;
@@ -77,7 +76,7 @@ namespace Alef.RoomMonitoring.DAL.Database
         {
             try
             {
-                var conn = getConnection();
+                var conn = GetConnection();
                 _busy = true;
                 var res = await conn.QueryAsync<T>(sql);
                 _busy = false;
@@ -94,7 +93,7 @@ namespace Alef.RoomMonitoring.DAL.Database
         {
             try
             {
-                var conn = getConnection();
+                var conn = GetConnection();
                 _busy = true;
                 var res = await conn.ExecuteScalarAsync<T>(sql);
                 _busy = false;

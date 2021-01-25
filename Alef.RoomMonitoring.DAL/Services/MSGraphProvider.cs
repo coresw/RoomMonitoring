@@ -29,10 +29,10 @@ namespace Alef.RoomMonitoring.DAL.Services
 
                 string query = "/users/" + roomEmail +
                     "/calendarView/delta?startdatetime=" +
-                    DateTime.Today.ToString("yyyy-MM-ddTHH:mm:ss") +
-                    "&enddatetime=" + DateTime.Today.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss");
+                    DateTime.Today.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") +
+                    "&enddatetime=" + DateTime.Today.ToUniversalTime().AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
 
-                JArray roomReservs = _graphAPI.SendRequestAsync(query).Result["value"] as JArray;
+                JArray roomReservs = (await _graphAPI.SendRequestAsync(query))["value"] as JArray;
 
                 foreach (JObject obj in roomReservs) 
                 {
@@ -42,7 +42,7 @@ namespace Alef.RoomMonitoring.DAL.Services
                         obj["organizer"]["emailAddress"]["address"] +
                         "/events?$filter=iCalUId eq '" + obj["iCalUId"]+"'";
 
-                    JObject reserv = _graphAPI.SendRequestAsync(reservQuery).Result["value"][0] as JObject;
+                    JObject reserv = (await _graphAPI.SendRequestAsync(reservQuery))["value"][0] as JObject;
 
                     OUser organizer = new OUser { 
                         Name = reserv["organizer"]["emailAddress"]["name"].ToString(),
@@ -52,10 +52,14 @@ namespace Alef.RoomMonitoring.DAL.Services
 
                     foreach (JObject attendee in reserv["attendees"]) {
 
-                        attendees.Add(new OUser { 
-                            Name = attendee["emailAddress"]["name"].ToString(),
-                            EmailAddress = attendee["emailAddress"]["address"].ToString()
-                        });
+                        if (attendee["type"].ToString() == "required" || attendee["type"].ToString() == "optional")
+                        {
+                            attendees.Add(new OUser
+                            {
+                                Name = attendee["emailAddress"]["name"].ToString(),
+                                EmailAddress = attendee["emailAddress"]["address"].ToString()
+                            });
+                        }
 
                     }
 
@@ -77,7 +81,7 @@ namespace Alef.RoomMonitoring.DAL.Services
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.Demystify(), "Failed fetching reservations: " + ex.Message);
+                _logger.Error(ex.Demystify(), "Failed fetching reservations");
                 throw;
             }
 

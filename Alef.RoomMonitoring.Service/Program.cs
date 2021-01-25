@@ -32,8 +32,6 @@ namespace Alef.RoomMonitoring.Service
                     services.AddLogging();
                     services.AddHostedService<RoomMonitoringWorker>();
                     services.AddSingleton<IConfigFileBootstrapLoader, ConfigFileBootstrapLoader>();
-                    //services.AddSingleton<IJobFactory, MonitoringJobFactory>();
-                    //services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
                 });
     }
 }

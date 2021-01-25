@@ -13,7 +13,7 @@ drop table if exists Room;
 create table Room(
 Id int primary key identity(1,1),
 Name varchar(25),
-EMail varchar(25) unique,
+EMail varchar(60) unique,
 EndpointIP varchar(40),
 );
 

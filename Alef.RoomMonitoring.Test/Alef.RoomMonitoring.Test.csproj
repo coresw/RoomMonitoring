@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Alef.RoomMonitoring.DAL\Alef.RoomMonitoring.DAL.csproj" />
+    <ProjectReference Include="..\Alef.RoomMonitoring.Service\Alef.RoomMonitoring.Service.csproj" />
   </ItemGroup>
 
 </Project>

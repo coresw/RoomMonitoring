@@ -3,6 +3,7 @@ using Alef.RoomMonitoring.Configuration.Interfaces;
 using Alef.RoomMonitoring.DAL.Model;
 using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using Alef.RoomMonitoring.Service.Services.Interfaces;
+using CiscoEndpointProvider;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -17,50 +18,49 @@ namespace Alef.RoomMonitoring.Service.Services
     /// </summary>
     public class CheckReservationService : ICheckReservationService
     {
-        private readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IReservationRepository _reservRepo;
         private readonly IRoomRepository _roomRepo;
-        private readonly DbConfiguration _dbConf;
-
-        #region Ctor
-
-        public CheckReservationService(IReservationRepository reservRepo, IRoomRepository roomRepo, IConfigFileBootstrapLoader config)
+        private readonly IEndpointProvider _endpoint;
+        private readonly IConfigFileBootstrapLoader _config;
+        
+        public CheckReservationService(IReservationRepository reservRepo, IRoomRepository roomRepo, IEndpointProvider endpoint, IConfigFileBootstrapLoader config)
         {
             _reservRepo = reservRepo;
             _roomRepo = roomRepo;
-            _dbConf = config.GetDbConfiguration();
+            _endpoint = endpoint;
+            _config = config;
         }
-
-        #endregion
-
-        #region Public methods
 
         public async Task CheckReservations()
         {
 
-            _logger.Info("Checking reservations...");
-
             try
             {
 
-                //Nacist rezervace z DB. Nacitaji se pouze rezervace, ktere nebyly jiz zpracovany tj. notifikovany atd.
+                _logger.Info("Checking reservations...");
 
-                IEnumerable<Reservation> reservations = await _reservRepo.GetWhere(reservationStatusId: ReservationStatus.UNCHECKED.Id,
-                    timeFrom: DateTime.Now, timeTo: DateTime.Today.AddDays(1));
+                IEnumerable<Reservation> reservations = await _reservRepo.GetWhere(
+                    "ReservationStatusId='"+ReservationStatus.UNCHECKED.Id+"'"+
+                    " and TimeFrom>='"+DateTime.Now.ToUniversalTime().ToString(_config.GetDbConfiguration().DateFormat)+"'"+
+                    " and TimeTo<='"+DateTime.Today.AddDays(1).ToUniversalTime().ToString(_config.GetDbConfiguration().DateFormat) +"'"
+                    );
 
                 foreach (Reservation r in reservations) {
 
-                    //bool occupied = _roomRepo.GetById(r.RoomId).Result.Occupied;
-                    bool occupied = false; // TODO: realtime
+                    Room room = await _roomRepo.GetById(r.RoomId);
+                    bool occupied = _endpoint.GetPeopleCount(room.EndpointIP)>0;
 
                     if (occupied)
                     {
                         r.ReservationStatusId = ReservationStatus.OK.Id;
+                        _logger.Info("Room " + room.Name + " status: OK");
                     }
                     else
                     {
                         // TODO: implement notification logic
                         r.ReservationStatusId = ReservationStatus.NOTIFIED.Id;
+                        _logger.Info("Room "+room.Name+" has a reservation but is not occupied!");
                     }
 
                     await _reservRepo.Update(r);
@@ -72,11 +72,10 @@ namespace Alef.RoomMonitoring.Service.Services
             }
             catch (Exception ex)
             {
-                _logger.Error(ex.Demystify(), "Failed checking reservations: "+ex);
+                _logger.Error(ex.Demystify(), "Failed checking reservations");
                 throw;
             }
         }
 
-        #endregion
     }
 }

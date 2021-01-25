@@ -5,6 +5,7 @@ using NLog;
 using Quartz;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,12 +30,11 @@ namespace Alef.RoomMonitoring.Service.ScheduledJobs
         {
             try
             {
-                
                 await _reservService.CheckReservations();
             }
             catch (Exception e)
             {
-                _logger.Error("CheckReservationJob failed: "+e.Message);
+                _logger.Error(e.Demystify(), "CheckReservationJob failed");
             }
         }
     }

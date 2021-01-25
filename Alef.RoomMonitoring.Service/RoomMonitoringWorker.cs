@@ -19,6 +19,7 @@ using Quartz;
 using Quartz.Impl;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,7 +70,6 @@ namespace Alef.RoomMonitoring.Service
                 await _scheduler.Start();
 
                 await ScheduleJob<IReservationSyncJob>(jobSettings, ReservationSyncJob.JobName);
-                await ScheduleJob<IRoomStatusSyncJob>(jobSettings, RoomStatusSyncJob.JobName);
                 await ScheduleJob<ICheckReservationJob>(jobSettings, CheckReservationJob.JobName);
 
                 _logger.Info("ScheduleJobs done!");
@@ -77,7 +77,7 @@ namespace Alef.RoomMonitoring.Service
             }
             catch (Exception ex)
             {
-                _logger.Error("Failed scheduling jobs: "+ex);
+                _logger.Error(ex.Demystify(), "Failed scheduling jobs");
                 throw;
             }
         }
@@ -164,11 +164,9 @@ namespace Alef.RoomMonitoring.Service
 
                 .AddSingleton<ICheckReservationService, CheckReservationService>()
                 .AddSingleton<IReservationSyncService, ReservationSyncService>()
-                .AddSingleton<IRoomStatusSyncService, RoomStatusSyncService>()
 
                 .AddSingleton<ICheckReservationJob, CheckReservationJob>()
                 .AddSingleton<IReservationSyncJob, ReservationSyncJob>()
-                .AddSingleton<IRoomStatusSyncJob, RoomStatusSyncJob>()
 
                 .AddLogging();
 

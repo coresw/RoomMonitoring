@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Alef.RoomMonitoring.Service.Services;
 using Alef.RoomMonitoring.Service.Services.Interfaces;
+using System.Diagnostics;
 
 namespace Alef.RoomMonitoring.Service.ScheduledJobs
 {
@@ -27,13 +28,11 @@ namespace Alef.RoomMonitoring.Service.ScheduledJobs
         {
             try
             {
-
                 await _service.SyncReservations();
-
             }
             catch (Exception e)
             {
-                _logger.Error("ReservationSyncJob failed: "+e.Message);
+                _logger.Error(e.Demystify(), "ReservationSyncJob failed");
             }
         }
 
