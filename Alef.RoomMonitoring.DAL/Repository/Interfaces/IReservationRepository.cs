@@ -1,4 +1,5 @@
-﻿using Alef.RoomMonitoring.DAL.Model;
+﻿using Alef.RoomMonitoring.DAL.Database.WhereConstraints;
+using Alef.RoomMonitoring.DAL.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,12 +9,13 @@ namespace Alef.RoomMonitoring.DAL.Repository.Interfaces
 {
     public interface IReservationRepository 
     {
-        Task Create(Reservation r);
-        Task<Reservation> GetById(int id);
-        Task<Reservation> GetByToken(string token);
-        Task<IEnumerable<Reservation>> GetAll();
-        Task<IEnumerable<Reservation>> GetWhere(string query);
-        Task Update(Reservation r);
-        Task Delete(Reservation r);
+        void Create(Reservation r);
+        Reservation GetById(int id);
+        Reservation GetByToken(string token);
+        IEnumerable<Reservation> GetAll();
+        IEnumerable<Reservation> GetWhere(IConstraint constraint);
+        void Update(Reservation r);
+        void Delete(Reservation r);
+        void DeleteWhere(IConstraint constraint);
     }
 }

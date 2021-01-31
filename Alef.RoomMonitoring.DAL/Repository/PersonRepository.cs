@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Alef.RoomMonitoring.DAL.Database.Interfaces;
 using System.Diagnostics;
+using Alef.RoomMonitoring.DAL.Database.WhereConstraints;
 
 namespace Alef.RoomMonitoring.DAL.Repository
 {
@@ -22,7 +23,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
         {
         }
 
-        public async Task Create(Person p)
+        public void Create(Person p)
         {
             try
             {
@@ -30,8 +31,8 @@ namespace Alef.RoomMonitoring.DAL.Repository
                     "'" + p.Name + "', " +
                     "'" + p.EMail + "'" +
                     ")";
-                await Database.ExecuteAsync(sql);
-                p.Id = (await GetByEMail(p.EMail)).Id;
+                Database.Execute(sql);
+                p.Id = GetByEMail(p.EMail).Id;
             }
             catch (Exception e)
             {
@@ -40,12 +41,12 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task Delete(Person p)
+        public void Delete(Person p)
         {
             try
             {
                 string sql = "delete from Person where EMail='"+p.EMail+"'";
-                await Database.ExecuteAsync(sql);
+                Database.Execute(sql);
             }
             catch (Exception e)
             {
@@ -54,25 +55,39 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<IEnumerable<Person>> GetAll()
+        public IEnumerable<Person> GetAll()
         {
             try
             {
-                return await Database.ExecuteQueryAsync<Person>("select * from Person");
+                return Database.ExecuteQuery<Person>("select * from Person");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.Error(e.Demystify(), "Failed querying from table Person");
                 throw;
             }
         }
 
-        public async Task<Person> GetByEMail(string eMail)
+        public IEnumerable<Person> GetWhere(IConstraint constraint)
+        {
+            try
+            {
+                string sql = "select * from Person where " + constraint.BuildSQL();
+                return Database.ExecuteQuery<Person>(sql);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e.Demystify(), "Failed querying from table Person");
+                throw;
+            }
+        }
+
+        public Person GetByEMail(string eMail)
         {
             try
             {
                 string sql = "select * from Person where EMail='" + eMail + "'";
-                IEnumerator<Person> query = (await Database.ExecuteQueryAsync<Person>(sql)).GetEnumerator();
+                IEnumerator<Person> query = Database.ExecuteQuery<Person>(sql).GetEnumerator();
                 if (!query.MoveNext())
                     return null;
                 return query.Current;
@@ -84,12 +99,12 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<Person> GetById(int id)
+        public Person GetById(int id)
         {
             try
             {
                 string sql = "select * from Person where Id='" + id + "'";
-                IEnumerator<Person> query = (await Database.ExecuteQueryAsync<Person>(sql)).GetEnumerator();
+                IEnumerator<Person> query = Database.ExecuteQuery<Person>(sql).GetEnumerator();
                 if (!query.MoveNext())
                     return null;
                 return query.Current;
@@ -101,7 +116,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task Update(Person p)
+        public void Update(Person p)
         {
             try
             {
@@ -109,11 +124,25 @@ namespace Alef.RoomMonitoring.DAL.Repository
                     "Name='" + p.Name + "'" +
                     " where EMail='"+p.EMail+"'" +
                     "";
-                await Database.ExecuteAsync(sql);
+                Database.Execute(sql);
             }
             catch (Exception e)
             {
                 _logger.Error(e.Demystify(), "Failed updating table Person");
+                throw;
+            }
+        }
+
+        public void DeleteWhere(IConstraint constraint)
+        {
+            try
+            {
+                string sql = "delete from Person where " + constraint.BuildSQL();
+                Database.Execute(sql);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e.Demystify(), "Failed deleting from table Person");
                 throw;
             }
         }

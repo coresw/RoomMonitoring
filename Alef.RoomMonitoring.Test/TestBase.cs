@@ -31,8 +31,7 @@ namespace Alef.RoomMonitoring.Test
             services.AddScoped<IAttendeeRepository, AttendeeRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
-            services.AddScoped<IAttendeeTypeRepository, AttendeeTypeRepository>();
-
+            
             services.AddScoped<IMSGraphAPI, MSGraphAPI>();
             services.AddSingleton<IMSGraphProvider, MSGraphProvider>();
 

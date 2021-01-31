@@ -21,7 +21,7 @@ create table ReservationStatus(
 Id int primary key,
 Name varchar(20) unique
 );
-insert into ReservationStatus(Id, Name) values (1, 'Unchecked'), (2, 'OK'), (3, 'Notified');
+insert into ReservationStatus(Id, Name) values (1, 'Unknown'), (2, 'OK'), (3, 'Notified'), (4, 'Upcoming'), (5, 'Past');
 
 create table Reservation(
 Id int primary key identity(1,1),

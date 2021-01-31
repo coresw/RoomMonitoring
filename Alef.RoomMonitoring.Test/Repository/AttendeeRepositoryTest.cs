@@ -15,7 +15,7 @@ namespace Alef.RoomMonitoring.Test.Repository
 
             var repo = serviceProvider.GetService<IAttendeeRepository>();
 
-            var result = await repo.GetAll();
+            var result = repo.GetAll();
 
             Assert.IsNotNull(result);
 

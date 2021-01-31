@@ -8,8 +8,11 @@ namespace Alef.RoomMonitoring.DAL.Model
     {
 
         public int Id { get; set; }
+        public static string ID = "Id";
         public string Name { get; set; }
+        public static string NAME = "Name";
         public string EMail { get; set; }
+        public static string EMAIL = "EMail";
 
         public override bool Equals(object obj)
         {

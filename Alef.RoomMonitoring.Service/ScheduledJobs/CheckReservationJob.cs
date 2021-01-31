@@ -30,7 +30,7 @@ namespace Alef.RoomMonitoring.Service.ScheduledJobs
         {
             try
             {
-                await _reservService.CheckReservations();
+                _reservService.CheckReservations();
             }
             catch (Exception e)
             {

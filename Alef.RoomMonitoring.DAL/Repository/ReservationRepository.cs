@@ -1,6 +1,7 @@
 ﻿using Alef.RoomMonitoring.Configuration.ConfigFileSections;
 using Alef.RoomMonitoring.Configuration.Interfaces;
 using Alef.RoomMonitoring.DAL.Database.Interfaces;
+using Alef.RoomMonitoring.DAL.Database.WhereConstraints;
 using Alef.RoomMonitoring.DAL.Model;
 using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using NLog;
@@ -26,7 +27,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
             _config = config.GetDbConfiguration();
         }
 
-        public async Task Create(Reservation r)
+        public void Create(Reservation r)
         {
             try
             {
@@ -42,8 +43,8 @@ namespace Alef.RoomMonitoring.DAL.Repository
                     ",'" + r.ReservationStatusId + "'" +
                     ",'" + r.RoomId + "'" +
                     ")";
-                await Database.ExecuteAsync(sql);
-                r.Id = (await GetByToken(r.Token)).Id;
+                Database.Execute(sql);
+                r.Id = GetByToken(r.Token).Id;
             }
             catch (Exception e)
             {
@@ -52,12 +53,12 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task Delete(Reservation r)
+        public void Delete(Reservation r)
         {
             try
             {
                 string sql = "delete from Reservation where Token='" + r.Token + "'";
-                await Database.ExecuteAsync(sql);
+                Database.Execute(sql);
             }
             catch (Exception e)
             {
@@ -66,11 +67,11 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<IEnumerable<Reservation>> GetAll()
+        public IEnumerable<Reservation> GetAll()
         {
             try
             {
-                return await Database.ExecuteQueryAsync<Reservation>("select * from Reservation");
+                return Database.ExecuteQuery<Reservation>("select * from Reservation");
             }
             catch (Exception e)
             {
@@ -79,12 +80,12 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<Reservation> GetByToken(string token)
+        public Reservation GetByToken(string token)
         {
             try
             {
                 string sql = "select * from Reservation where Token='" + token + "'";
-                IEnumerator<Reservation> query = (await Database.ExecuteQueryAsync<Reservation>(sql)).GetEnumerator();
+                IEnumerator<Reservation> query = Database.ExecuteQuery<Reservation>(sql).GetEnumerator();
                 if (!query.MoveNext())
                     return null;
                 return query.Current;
@@ -96,13 +97,13 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<IEnumerable<Reservation>> GetWhere(string query)
+        public IEnumerable<Reservation> GetWhere(IConstraint constraint)
         {
             try
             {
 
-                string sql = "select * from Reservation where " + query;
-                return await Database.ExecuteQueryAsync<Reservation>(sql);
+                string sql = "select * from Reservation where " + constraint.BuildSQL();
+                return Database.ExecuteQuery<Reservation>(sql);
             }
             catch (Exception e)
             {
@@ -111,12 +112,12 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<Reservation> GetById(int id)
+        public Reservation GetById(int id)
         {
             try
             {
                 string sql = "select * from Reservation where Id='" + id + "'";
-                IEnumerator<Reservation> query = (await Database.ExecuteQueryAsync<Reservation>(sql)).GetEnumerator();
+                IEnumerator<Reservation> query = Database.ExecuteQuery<Reservation>(sql).GetEnumerator();
                 if (!query.MoveNext())
                     return null;
                 return query.Current;
@@ -128,7 +129,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task Update(Reservation r)
+        public void Update(Reservation r)
         {
             try
             {
@@ -143,11 +144,25 @@ namespace Alef.RoomMonitoring.DAL.Repository
                     ",RoomId='" + r.RoomId + "'" +
                     " where Token='" + r.Token + "'" +
                     "";
-                await Database.ExecuteAsync(sql);
+                Database.Execute(sql);
             }
             catch (Exception e)
             {
                 _logger.Error(e.Demystify(), "Failed updating table Reservation");
+                throw;
+            }
+        }
+
+        public void DeleteWhere(IConstraint constraint)
+        {
+            try
+            {
+                string sql = "delete from Reservation where " + constraint.BuildSQL();
+                Database.Execute(sql);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e.Demystify(), "Failed deleting from table Reservation");
                 throw;
             }
         }

@@ -30,7 +30,7 @@ namespace Alef.RoomMonitoring.DAL.Services
                 string query = "/users/" + roomEmail +
                     "/calendarView/delta?startdatetime=" +
                     DateTime.Today.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") +
-                    "&enddatetime=" + DateTime.Today.ToUniversalTime().AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
+                    "&enddatetime=" + DateTime.Today.AddDays(1).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
 
                 JArray roomReservs = (await _graphAPI.SendRequestAsync(query))["value"] as JArray;
 

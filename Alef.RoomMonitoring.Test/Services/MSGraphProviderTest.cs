@@ -24,7 +24,7 @@ namespace Alef.RoomMonitoring.Test.Services
 
             try
             {
-                var room = await roomRepo.GetById(1);
+                var room = roomRepo.GetById(1);
                 await service.GetUpcomingRoomReservations(room.EMail);
                 Assert.IsTrue(true);
             }

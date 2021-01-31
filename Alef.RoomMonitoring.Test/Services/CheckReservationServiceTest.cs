@@ -21,7 +21,7 @@ namespace Alef.RoomMonitoring.Test.Services
 
             try
             {
-                await service.CheckReservations();
+                service.CheckReservations();
                 Assert.IsTrue(true);
             }
             catch(Exception e)

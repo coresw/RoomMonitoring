@@ -20,8 +20,6 @@ namespace Alef.RoomMonitoring.DAL.Database
         private SqlConnection _connection;
         private string _connectionString;
 
-        private bool _busy;
-
         public DBProvider(IConnectionStringProvider connectionStringProvider) {
 
             _connectionString = connectionStringProvider.Value;
@@ -45,63 +43,61 @@ namespace Alef.RoomMonitoring.DAL.Database
 
             }
 
-            while (_busy)
-            {
-                Thread.Sleep(10); // thread safety - only one command at once
-                _logger.Info("Database is busy! Request queued");
-            }
-
             return _connection;
 
         }
 
-        public async Task<int> ExecuteAsync(string sql)
+        public int Execute(string sql)
         {
             try
             {
-                var conn = GetConnection();
-                _busy = true;
-                var res = await conn.ExecuteAsync(sql);
-                _busy = false;
+                int res;
+                var con = GetConnection();
+                lock (con)
+                {
+                    res = con.Execute(sql);
+                }
                 return res;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Demystify(), "Failed executing '" + sql + "'");
+                _logger.Error(e.Demystify(), "Failed executing '" + sql + "': "+e.Message);
                 throw;
             }
         }
 
-        public async Task<IEnumerable<T>> ExecuteQueryAsync<T>(string sql)
+        public IEnumerable<T> ExecuteQuery<T>(string sql)
         {
             try
             {
-                var conn = GetConnection();
-                _busy = true;
-                var res = await conn.QueryAsync<T>(sql);
-                _busy = false;
+                var con = GetConnection();
+                IEnumerable<T> res;
+                lock (con) {
+                    res = con.Query<T>(sql);
+                }
                 return res;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Demystify(), "Failed querying '" + sql + "'");
+                _logger.Error(e.Demystify(), "Failed querying '" + sql + "': "+e.Message);
                 throw;
             }
         }
 
-        public async Task<T> ExecuteScalarAsync<T>(string sql)
+        public T ExecuteScalar<T>(string sql)
         {
             try
             {
-                var conn = GetConnection();
-                _busy = true;
-                var res = await conn.ExecuteScalarAsync<T>(sql);
-                _busy = false;
+                var con = GetConnection();
+                T res;
+                lock (con) {
+                    res = con.ExecuteScalar<T>(sql);
+                }
                 return res;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Demystify(), "Failed executing scalar '" + sql + "'");
+                _logger.Error(e.Demystify(), "Failed executing scalar '" + sql + "': "+e.Message);
                 throw;
             }
         }

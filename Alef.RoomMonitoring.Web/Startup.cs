@@ -2,6 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Alef.RoomMonitoring.Configuration;
+using Alef.RoomMonitoring.Configuration.Interfaces;
+using Alef.RoomMonitoring.DAL.Database;
+using Alef.RoomMonitoring.DAL.Database.Interfaces;
+using Alef.RoomMonitoring.DAL.Repository;
+using Alef.RoomMonitoring.DAL.Repository.Interfaces;
+using Alef.RoomMonitoring.DAL.Services;
+using Alef.RoomMonitoring.DAL.Services.Interfaces;
+using CiscoEndpointProvider;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -24,6 +33,18 @@ namespace Alef.RoomMonitoring.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddSingleton<IConfigFileBootstrapLoader, ConfigFileBootstrapLoader>();
+
+            services.AddSingleton<IMSGraphProvider, MSGraphProvider>();
+            services.AddSingleton<IEndpointProvider, MockEndpointProvider>();
+            services.AddSingleton<IDBProvider, DBProvider>();
+            services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
+            services.AddSingleton<IMSGraphAPI, MSGraphAPI>();
+
+            services.AddSingleton<IReservationRepository, ReservationRepository>();
+            services.AddSingleton<IRoomRepository, RoomRepository>();
+            services.AddSingleton<IPersonRepository, PersonRepository>();
+            services.AddSingleton<IAttendeeRepository, AttendeeRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

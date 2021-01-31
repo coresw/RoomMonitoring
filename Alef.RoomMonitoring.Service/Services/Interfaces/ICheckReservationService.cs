@@ -7,6 +7,6 @@ namespace Alef.RoomMonitoring.Service.Services.Interfaces
 {
     public interface ICheckReservationService
     {
-        Task CheckReservations();
+        void CheckReservations();
     }
 }

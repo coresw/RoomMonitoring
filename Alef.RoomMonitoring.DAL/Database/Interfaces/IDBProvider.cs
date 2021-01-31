@@ -8,9 +8,9 @@ namespace Alef.RoomMonitoring.DAL.Database.Interfaces
     public interface IDBProvider
     {
 
-        Task<int> ExecuteAsync(string sql);
-        Task<IEnumerable<T>> ExecuteQueryAsync<T>(string sql);
-        Task<T> ExecuteScalarAsync<T>(string sql);
+        int Execute(string sql);
+        IEnumerable<T> ExecuteQuery<T>(string sql);
+        T ExecuteScalar<T>(string sql);
         void Close();
 
     }

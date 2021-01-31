@@ -1,5 +1,6 @@
 ﻿using Alef.RoomMonitoring.Configuration.Interfaces;
 using Alef.RoomMonitoring.DAL.Database.Interfaces;
+using Alef.RoomMonitoring.DAL.Database.WhereConstraints;
 using Alef.RoomMonitoring.DAL.Model;
 using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using NLog;
@@ -19,7 +20,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
         {
         }
 
-        public async Task Create(Room r)
+        public void Create(Room r)
         {
             try
             {
@@ -28,7 +29,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
                     ",'" + r.EMail + "'" +
                     ",'" + r.EndpointIP + "'" +
                     ")";
-                await Database.ExecuteAsync(sql);
+                Database.Execute(sql);
             }
             catch (Exception e)
             {
@@ -37,13 +38,13 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task Delete(Room r)
+        public void Delete(Room r)
         {
             try
             {
                 string sql = "delete from Room where " +
                     "EMail='" + r.EMail + "'";
-                await Database.ExecuteAsync(sql);
+                Database.Execute(sql);
             }
             catch (Exception e)
             {
@@ -52,11 +53,11 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<IEnumerable<Room>> GetAll()
+        public IEnumerable<Room> GetAll()
         {
             try
             {
-                return await Database.ExecuteQueryAsync<Room>("select * from Room");
+                return Database.ExecuteQuery<Room>("select * from Room");
             }
             catch (Exception e)
             {
@@ -65,13 +66,27 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<Room> GetByEMail(string email)
+        public IEnumerable<Room> GetWhere(IConstraint constraint)
+        {
+            try
+            {
+                string sql = "select * from Room where " + constraint.BuildSQL();
+                return Database.ExecuteQuery<Room>(sql);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e.Demystify(), "Failed querying from table Room");
+                throw;
+            }
+        }
+
+        public Room GetByEMail(string email)
         {
             try
             {
                 string sql = "select * from Room where " +
                     "EMail='" + email + "'";
-                IEnumerator<Room> query = (await Database.ExecuteQueryAsync<Room>(sql)).GetEnumerator();
+                IEnumerator<Room> query = Database.ExecuteQuery<Room>(sql).GetEnumerator();
                 if (!query.MoveNext())
                     return null;
                 return query.Current;
@@ -83,12 +98,12 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task<Room> GetById(int id)
+        public Room GetById(int id)
         {
             try
             {
                 string sql = "select * from Room where Id='" + id + "'";
-                IEnumerator<Room> query = (await Database.ExecuteQueryAsync<Room>(sql)).GetEnumerator();
+                IEnumerator<Room> query = Database.ExecuteQuery<Room>(sql).GetEnumerator();
                 if (!query.MoveNext())
                     return null;
                 return query.Current;
@@ -100,7 +115,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
-        public async Task Update(Room r)
+        public void Update(Room r)
         {
             try
             {
@@ -108,7 +123,7 @@ namespace Alef.RoomMonitoring.DAL.Repository
                     "Name='" + r.Name + "'" +
                     ", EndpointIP='" + r.EndpointIP + "'" +
                     " where EMail='" + r.EMail + "'";
-                await Database.ExecuteAsync(sql);
+                Database.Execute(sql);
             }
             catch (Exception e)
             {
@@ -117,5 +132,18 @@ namespace Alef.RoomMonitoring.DAL.Repository
             }
         }
 
+        public void DeleteWhere(IConstraint constraint)
+        {
+            try
+            {
+                string sql = "delete from Room where " + constraint.BuildSQL();
+                Database.Execute(sql);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e.Demystify(), "Failed deleting from table Room");
+                throw;
+            }
+        }
     }
 }

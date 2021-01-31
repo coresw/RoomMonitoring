@@ -1,4 +1,5 @@
-﻿using Alef.RoomMonitoring.DAL.Model;
+﻿using Alef.RoomMonitoring.DAL.Database.WhereConstraints;
+using Alef.RoomMonitoring.DAL.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,11 +9,13 @@ namespace Alef.RoomMonitoring.DAL.Repository.Interfaces
 {
     public interface IPersonRepository 
     {
-        Task Create(Person p);
-        Task<Person> GetById(int id);
-        Task<Person> GetByEMail(string eMail);
-        Task<IEnumerable<Person>> GetAll();
-        Task Update(Person p);
-        Task Delete(Person p);
+        void Create(Person p);
+        Person GetById(int id);
+        Person GetByEMail(string eMail);
+        IEnumerable<Person> GetAll();
+        IEnumerable<Person> GetWhere(IConstraint constraint);
+        void Update(Person p);
+        void Delete(Person p);
+        void DeleteWhere(IConstraint constraint);
     }
 }

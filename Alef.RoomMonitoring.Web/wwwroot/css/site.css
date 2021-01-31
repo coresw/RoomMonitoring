@@ -1,2 +1,9 @@
 ﻿
+tr:nth-of-type(2n) {
+    background: #CCCCCC;
+    border: solid black 1px;
+}
 
+tbody {
+    overflow-y: scroll;
+}

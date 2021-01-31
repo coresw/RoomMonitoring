@@ -1,4 +1,5 @@
-﻿using Alef.RoomMonitoring.DAL.Model;
+﻿using Alef.RoomMonitoring.DAL.Database.WhereConstraints;
+using Alef.RoomMonitoring.DAL.Model;
 using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using Alef.RoomMonitoring.DAL.Services.Interfaces;
 using Alef.RoomMonitoring.DAL.Services.Model;
@@ -40,19 +41,16 @@ namespace Alef.RoomMonitoring.Service.Services
                 _logger.Info("Syncing reservations...");
                 int reservations = 0, persons = 0, attendees = 0;
 
-                IEnumerable<Room> rooms = await _roomRepo.GetAll();
+                IEnumerable<Room> rooms = _roomRepo.GetAll();
 
                 foreach (Room room in rooms)
                 {
 
                     var oReservations = await _graphProvider.GetUpcomingRoomReservations(room.EMail);
-                    var dbReservations = await _reservRepo.GetAll();
+                    var dbReservations = _reservRepo.GetWhere(new EqualConstraint(Reservation.ROOM_ID, room.Id));
 
                     // remove reservations for this room from db if removed not in office
                     foreach (Reservation res in dbReservations) {
-
-                        // keep reservation if not for this room
-                        if (res.RoomId != room.Id) continue;
 
                         // find this reservation in office
                         bool inOffice = oReservations.Any(r =>
@@ -61,7 +59,11 @@ namespace Alef.RoomMonitoring.Service.Services
                         });
 
                         if (!inOffice) {
-                            await _reservRepo.Delete(res);
+                            _attendRepo.DeleteWhere(
+                                new EqualConstraint(Attendee.RESERVATION_ID, res.Id)
+                                );
+                            _reservRepo.Delete(res);
+                            reservations++;
                         }
 
                     }
@@ -70,7 +72,7 @@ namespace Alef.RoomMonitoring.Service.Services
                     foreach (OReservation or in oReservations)
                     {
 
-                        Reservation dbr = await _reservRepo.GetByToken(or.Id);
+                        Reservation dbr = _reservRepo.GetByToken(or.Id);
 
                         if (dbr == null) // reservation is not in DB
                         {
@@ -84,9 +86,9 @@ namespace Alef.RoomMonitoring.Service.Services
                                 TimeTo = or.TimeTo,
                                 Modified = or.Modified,
                                 RoomId = room.Id,
-                                ReservationStatusId = ReservationStatus.UNCHECKED.Id,
+                                ReservationStatusId = ReservationStatus.UNKNOWN.Id,
                             };
-                            await _reservRepo.Create(dbr);
+                            _reservRepo.Create(dbr);
                         }
                         else if (or.Modified != dbr.Modified) // reservation was updated
                         {
@@ -96,8 +98,8 @@ namespace Alef.RoomMonitoring.Service.Services
                             dbr.TimeFrom = or.TimeFrom;
                             dbr.TimeTo = or.TimeTo;
                             dbr.RoomId = room.Id;
-                            dbr.ReservationStatusId = ReservationStatus.UNCHECKED.Id;
-                            await _reservRepo.Update(dbr);
+                            dbr.ReservationStatusId = ReservationStatus.UNKNOWN.Id;
+                            _reservRepo.Update(dbr);
                         }
                         else // reservation is unchanged
                         {
@@ -110,7 +112,7 @@ namespace Alef.RoomMonitoring.Service.Services
 
                         // create new attendees if not in DB
                         OUser ou = or.Organizer;
-                        Person op = await _personRepo.GetByEMail(ou.EmailAddress);
+                        Person op = _personRepo.GetByEMail(ou.EmailAddress);
                         if (op == null)
                         { // person is not in DB
                             op = new Person
@@ -118,8 +120,8 @@ namespace Alef.RoomMonitoring.Service.Services
                                 EMail = ou.EmailAddress,
                                 Name = ou.Name,
                             };
-                            await _personRepo.Create(op);
-                            await _attendRepo.Create(new Attendee
+                            _personRepo.Create(op);
+                            _attendRepo.Create(new Attendee
                             {
                                 PersonId = op.Id,
                                 ReservationId = dbr.Id,
@@ -130,10 +132,10 @@ namespace Alef.RoomMonitoring.Service.Services
                         }
                         else
                         {
-                            Attendee a = await _attendRepo.GetByPersonReservation(op.Id, dbr.Id);
+                            Attendee a = _attendRepo.GetByPersonReservation(op.Id, dbr.Id);
                             if (a == null) // attendee is not in DB
                             {
-                                await _attendRepo.Create(new Attendee
+                                _attendRepo.Create(new Attendee
                                 {
                                     PersonId = op.Id,
                                     ReservationId = dbr.Id,
@@ -145,7 +147,7 @@ namespace Alef.RoomMonitoring.Service.Services
 
                         foreach (OUser u in or.Attendees)
                         {
-                            Person p = await _personRepo.GetByEMail(u.EmailAddress);
+                            Person p = _personRepo.GetByEMail(u.EmailAddress);
                             if (p == null) // person is not in DB
                             {
                                 p = new Person
@@ -153,8 +155,8 @@ namespace Alef.RoomMonitoring.Service.Services
                                     EMail = u.EmailAddress,
                                     Name = u.Name,
                                 };
-                                await _personRepo.Create(p);
-                                await _attendRepo.Create(new Attendee
+                                _personRepo.Create(p);
+                                _attendRepo.Create(new Attendee
                                 {
                                     PersonId = p.Id,
                                     ReservationId = dbr.Id,
@@ -165,10 +167,10 @@ namespace Alef.RoomMonitoring.Service.Services
                             }
                             else
                             {
-                                Attendee a = await _attendRepo.GetByPersonReservation(p.Id, dbr.Id);
+                                Attendee a = _attendRepo.GetByPersonReservation(p.Id, dbr.Id);
                                 if (a == null) // attendee is not in DB
                                 {
-                                    await _attendRepo.Create(new Attendee
+                                    _attendRepo.Create(new Attendee
                                     {
                                         PersonId = p.Id,
                                         ReservationId = dbr.Id,

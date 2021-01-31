@@ -1,6 +1,41 @@
 ﻿@page
+@model IndexModel
 @{
-    ViewData["title"] = "Room Monitoring";
+    ViewData["Title"] = "Reservations";
 }
+@using Alef.RoomMonitoring.DAL.Model;
+@using Alef.RoomMonitoring.DAL.Database.WhereConstraints;
 
 <h1>Reservations</h1>
+
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Room</th>
+                <th>Organizer</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Reservation r in Model.ReservRepo.GetAll()) {
+                <tr>
+                    <td>@r.Name</td>
+                    <td>@r.TimeFrom.ToLocalTime()</td>
+                    <td>@r.TimeTo.ToLocalTime()</td>
+                    <td>@((Model.RoomRepo.GetById(r.RoomId)).Name)</td>
+                    <td>@(Model.PersRepo.GetById(Model.AttendRepo.GetWhere(
+                            new AndConstraint(
+                                new EqualConstraint(Attendee.RESERVATION_ID, r.Id),
+                                new EqualConstraint(Attendee.ATTENDEE_TYPE_ID, AttendeeType.ORGANIZER.Id)
+                            )
+                        ).First().PersonId).Name)</td>
+                    <td>@(ReservationStatus.GetById(r.ReservationStatusId).Name)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
