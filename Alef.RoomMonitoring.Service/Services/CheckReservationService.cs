@@ -43,30 +43,53 @@ namespace Alef.RoomMonitoring.Service.Services
 
                 IEnumerable<Reservation> reservations = _reservRepo.GetWhere(
                     new AndConstraint(
-                        new EqualConstraint(Reservation.RESERVATION_STATUS_ID, ReservationStatus.UNKNOWN.Id),
-                        new LessOrEqualConstraint(Reservation.TIME_FROM, DateTime.Now.ToUniversalTime().ToString(_config.GetDbConfiguration().DateFormat)),
-                        new GreaterOrEqualConstraint(Reservation.TIME_TO, DateTime.Now.ToUniversalTime().ToString(_config.GetDbConfiguration().DateFormat))
+                        new NotEqualConstraint(Reservation.RESERVATION_STATUS_ID, ReservationStatus.CLOSED.Id)
                         )
                     );
 
+                var ActiveTimeout = _config.GetReservationSettings().CheckTimeout;
+
                 foreach (Reservation r in reservations) {
 
+                    if (DateTime.Now.ToUniversalTime() < r.TimeFrom) continue;
+
+                    if (DateTime.Now.ToUniversalTime() < r.TimeFrom.AddMinutes(ActiveTimeout)) {
+                        if (r.ReservationStatusId == ReservationStatus.PLANNED.Id)
+                        {
+                            r.ReservationStatusId = ReservationStatus.ACTIVE.Id;
+                            _reservRepo.Update(r);
+                        }
+                        continue;
+                    }
+
+                    if (DateTime.Now.ToUniversalTime() > r.TimeTo) {
+                        r.ReservationStatusId = ReservationStatus.CLOSED.Id;
+                        _reservRepo.Update(r);
+                        continue;
+                    }
+
                     Room room = _roomRepo.GetById(r.RoomId);
-                    bool occupied = _endpoint.GetPeopleCount(room.EndpointIP)>0;
+                    bool occupied = _endpoint.GetPeopleCount(room.EndpointIP) > 0;
 
                     if (occupied)
                     {
-                        r.ReservationStatusId = ReservationStatus.OK.Id;
-                        _logger.Info("Room " + room.Name + " status: OK");
+                        if (r.ReservationStatusId != ReservationStatus.ACTIVE.Id) {
+                            r.ReservationStatusId = ReservationStatus.ACTIVE.Id;
+                            _reservRepo.Update(r);
+                            _logger.Info("Room " + room.Name + " status changed to active");
+                        }
                     }
                     else
                     {
-                        // TODO: implement notification logic
-                        r.ReservationStatusId = ReservationStatus.NOTIFIED.Id;
-                        _logger.Info("Room "+room.Name+" has a reservation but is not occupied!");
-                    }
+                        if (r.ReservationStatusId != ReservationStatus.EMPTY.Id) {
 
-                    _reservRepo.Update(r);
+                            // TODO: implement notification logic
+
+                            r.ReservationStatusId = ReservationStatus.EMPTY.Id;
+                            _reservRepo.Update(r);
+                        }
+                        _logger.Info("Room "+room.Name+" status changed to empty! Attendees will be notified");
+                    }
 
                 }
 

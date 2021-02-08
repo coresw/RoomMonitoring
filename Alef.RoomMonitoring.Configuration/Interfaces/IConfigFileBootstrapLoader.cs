@@ -13,5 +13,8 @@ namespace Alef.RoomMonitoring.Configuration.Interfaces
         DbConfiguration GetDbConfiguration();
 
         MSGraphSetting GetMSGraphSetting();
+
+        ReservationSettings GetReservationSettings();
+
     }
 }

@@ -1,9 +1,64 @@
 ﻿
-tr:nth-of-type(2n) {
-    background: #CCCCCC;
-    border: solid black 1px;
+body {
+    margin: 0px;
+}
+
+.container {
+    
+    font-family: Alef;
+    background-color: #e7f7ff;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+
+}
+
+.title {
+    
+    font-weight: bold;
+    font-size: 48px;
+    margin: 16px;
+    
+}
+
+.tableWrapper {
+
+    margin: 16px;
+
+}
+
+thead {
+
+    background-color: #71adcb;
+
+}
+
+th {
+    padding: 12px;
+}
+
+td {
+    padding: 8px;
+}
+
+tbody tr {
+    border-top: 1px solid black;
+}
+
+tbody tr:nth-child(2n+1) {
+    background: #bbdaea;
+}
+
+tbody tr:nth-child(2n) {
+    background: #aacfe2;
 }
 
 tbody {
     overflow-y: scroll;
+}
+
+table {
+    border-collapse: collapse;
 }

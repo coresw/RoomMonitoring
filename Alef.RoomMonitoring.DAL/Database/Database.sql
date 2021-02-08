@@ -19,9 +19,10 @@ EndpointIP varchar(40),
 
 create table ReservationStatus(
 Id int primary key,
-Name varchar(20) unique
+Name varchar(20) unique,
+Display varchar(30),
 );
-insert into ReservationStatus(Id, Name) values (1, 'Unknown'), (2, 'OK'), (3, 'Notified'), (4, 'Upcoming'), (5, 'Past');
+insert into ReservationStatus(Id, Name, Display) values (1, 'PLANNED', 'Planned'), (2, 'ACTIVE', 'Active'), (3, 'EMPTY', 'Empty'), (4, 'CLOSED', 'Closed');
 
 create table Reservation(
 Id int primary key identity(1,1),

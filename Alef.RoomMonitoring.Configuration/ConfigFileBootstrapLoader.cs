@@ -55,7 +55,6 @@ namespace Alef.RoomMonitoring.Configuration
             //return DbConfiguration.Read(xmlConfig);
         }
 
-
         public MSGraphSetting GetMSGraphSetting()
         {
             MSGraphSetting result = new MSGraphSetting()
@@ -69,5 +68,11 @@ namespace Alef.RoomMonitoring.Configuration
             return (result);
         }
 
+        public ReservationSettings GetReservationSettings()
+        {
+            return new ReservationSettings {
+                CheckTimeout = 15,
+            };
+        }
     }
 }

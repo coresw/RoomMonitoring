@@ -6,9 +6,9 @@
 @using Alef.RoomMonitoring.DAL.Model;
 @using Alef.RoomMonitoring.DAL.Database.WhereConstraints;
 
-<h1>Reservations</h1>
+<div class="title">Reservations</div>
 
-<div>
+<div class="tableWrapper">
     <table>
         <thead>
             <tr>
@@ -21,7 +21,9 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (Reservation r in Model.ReservRepo.GetAll()) {
+            @foreach (Reservation r in Model.ReservRepo.GetWhere(
+                 new NotEqualConstraint(Reservation.RESERVATION_STATUS_ID, ReservationStatus.CLOSED.Id))
+                ) {
                 <tr>
                     <td>@r.Name</td>
                     <td>@r.TimeFrom.ToLocalTime()</td>
@@ -33,7 +35,7 @@
                                 new EqualConstraint(Attendee.ATTENDEE_TYPE_ID, AttendeeType.ORGANIZER.Id)
                             )
                         ).First().PersonId).Name)</td>
-                    <td>@(ReservationStatus.GetById(r.ReservationStatusId).Name)</td>
+                    <td>@(ReservationStatus.GetById(r.ReservationStatusId).Display)</td>
                 </tr>
             }
         </tbody>

@@ -7,52 +7,50 @@ namespace Alef.RoomMonitoring.DAL.Model
     public class ReservationStatus
     {
 
-        public static readonly ReservationStatus UNKNOWN = new ReservationStatus
+        public static readonly ReservationStatus PLANNED = new ReservationStatus
         { 
             Id = 1,
-            Name = "Unknown",
+            Name = "PLANNED",
+            Display = "Planned",
         };
 
-        public static readonly ReservationStatus OK = new ReservationStatus
+        public static readonly ReservationStatus ACTIVE = new ReservationStatus
         {
             Id = 2,
-            Name = "OK",
+            Name = "ACTIVE",
+            Display = "Active",
         };
 
-        public static readonly ReservationStatus NOTIFIED = new ReservationStatus
+        public static readonly ReservationStatus EMPTY = new ReservationStatus
         {
             Id = 3,
-            Name = "Notified",
+            Name = "EMPTY",
+            Display = "Room Empty",
         };
-        public static readonly ReservationStatus UPCOMING = new ReservationStatus
+        public static readonly ReservationStatus CLOSED = new ReservationStatus
         {
             Id = 4,
-            Name = "Upcoming",
-        };
-        public static readonly ReservationStatus PAST = new ReservationStatus
-        {
-            Id = 5,
-            Name = "Past",
+            Name = "CLOSED",
+            Display = "Closed",
         };
 
         public static ReservationStatus GetById(int id) {
             switch (id) {
                 case 1:
-                    return UNKNOWN;
+                    return PLANNED;
                 case 2:
-                    return OK;
+                    return ACTIVE;
                 case 3:
-                    return NOTIFIED;
+                    return EMPTY;
                 case 4:
-                    return UPCOMING;
-                case 5:
-                    return PAST;
+                    return CLOSED;
             }
             return null;
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Display { get; set; }
 
         private ReservationStatus() { }
 

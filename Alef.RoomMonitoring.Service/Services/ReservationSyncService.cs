@@ -86,7 +86,7 @@ namespace Alef.RoomMonitoring.Service.Services
                                 TimeTo = or.TimeTo,
                                 Modified = or.Modified,
                                 RoomId = room.Id,
-                                ReservationStatusId = ReservationStatus.UNKNOWN.Id,
+                                ReservationStatusId = ReservationStatus.PLANNED.Id,
                             };
                             _reservRepo.Create(dbr);
                         }
@@ -98,7 +98,7 @@ namespace Alef.RoomMonitoring.Service.Services
                             dbr.TimeFrom = or.TimeFrom;
                             dbr.TimeTo = or.TimeTo;
                             dbr.RoomId = room.Id;
-                            dbr.ReservationStatusId = ReservationStatus.UNKNOWN.Id;
+                            dbr.ReservationStatusId = ReservationStatus.PLANNED.Id;
                             _reservRepo.Update(dbr);
                         }
                         else // reservation is unchanged
