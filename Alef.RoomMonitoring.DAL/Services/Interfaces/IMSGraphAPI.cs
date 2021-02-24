@@ -8,6 +8,7 @@ namespace Alef.RoomMonitoring.DAL.Services.Interfaces
 {
     public interface IMSGraphAPI
     {
-        Task<JObject> SendRequestAsync(string request);
+        Task<JObject> GetAsync(string request);
+        Task PostAsync(string request, JObject body);
     }
 }

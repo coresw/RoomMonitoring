@@ -18,11 +18,11 @@ EndpointIP varchar(40),
 );
 
 create table ReservationStatus(
-Id int primary key,
+Id int primary key identity(1,1),
 Name varchar(20) unique,
 Display varchar(30),
 );
-insert into ReservationStatus(Id, Name, Display) values (1, 'PLANNED', 'Planned'), (2, 'ACTIVE', 'Active'), (3, 'EMPTY', 'Empty'), (4, 'CLOSED', 'Closed');
+insert into ReservationStatus(Name, Display) values ('PLANNED', 'Planned'), ('ACTIVE', 'Active'), ('EMPTY', 'Empty'), ('CLOSED', 'Closed');
 
 create table Reservation(
 Id int primary key identity(1,1),
@@ -47,7 +47,7 @@ create table AttendeeType(
 Id int primary key,
 Name varchar(20) unique
 );
-insert into AttendeeType(Id, Name) values (1, 'Organizer'), (2, 'Required'), (3, 'Optional');
+insert into AttendeeType(Id, Name) values (1, 'ORGANIZER'), (2, 'REQUIRED');
 
 create table Attendee(
 Id int primary key identity(1,1),

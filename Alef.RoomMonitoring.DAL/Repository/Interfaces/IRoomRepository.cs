@@ -7,15 +7,8 @@ using System.Threading.Tasks;
 
 namespace Alef.RoomMonitoring.DAL.Repository.Interfaces
 {
-    public interface IRoomRepository 
+    public interface IRoomRepository : IBaseRepository<Room>
     {
         void Create(Room r);
-        Room GetById(int id);
-        Room GetByEMail(string email);
-        IEnumerable<Room> GetAll();
-        IEnumerable<Room> GetWhere(IConstraint constraint);
-        void Update(Room r);
-        void Delete(Room r);
-        void DeleteWhere(IConstraint constraint);
     }
 }

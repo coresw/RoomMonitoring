@@ -26,13 +26,11 @@ namespace Alef.RoomMonitoring.DAL.Services
             _configLoader = configLoader;
         }
 
-        public async Task<JObject> SendRequestAsync(string request) 
+        public async Task<JObject> GetAsync(string request) 
         {
 
             string accessToken = GetAccessToken();
-
             var setting = _configLoader.GetMSGraphSetting();
-
             string url = setting.Url + "v1.0/" + request;
 
             HttpClient client = new HttpClient();
@@ -59,8 +57,30 @@ namespace Alef.RoomMonitoring.DAL.Services
             }
             else
             {
-                _logger.Error(response.StatusCode+" "+content);
-                throw new Exception("Failed processing request: "+response.StatusCode+" "+content);
+                _logger.Error("Get request returned "+response.StatusCode+" "+content);
+                throw new Exception("Get request failed: "+response.StatusCode+" "+content);
+            }
+
+        }
+
+        public async Task PostAsync(string request, JObject body)
+        {
+
+            string accessToken = GetAccessToken();
+            var setting = _configLoader.GetMSGraphSetting();
+            string url = setting.Url + "v1.0/" + request;
+
+            HttpClient client = new HttpClient();
+
+            //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
+
+            HttpResponseMessage response = await client.PostAsync(url, new StringContent(body.ToString(), Encoding.UTF8, "application/json"));
+
+            if (!response.IsSuccessStatusCode) {
+                string content = await response.Content.ReadAsStringAsync();
+                _logger.Error("Post request returned "+response.StatusCode+" "+content);
+                throw new Exception("Post request failed: " + response.StatusCode+" "+content);
             }
 
         }

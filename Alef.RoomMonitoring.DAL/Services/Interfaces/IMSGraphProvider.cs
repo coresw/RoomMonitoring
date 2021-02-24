@@ -9,5 +9,6 @@ namespace Alef.RoomMonitoring.DAL.Services.Interfaces
     public interface IMSGraphProvider
     {
         Task<IEnumerable<OReservation>> GetUpcomingRoomReservations(string roomEmail);
+        Task SendMail(string from, string subject, string body, IEnumerable<string> to);
     }
 }

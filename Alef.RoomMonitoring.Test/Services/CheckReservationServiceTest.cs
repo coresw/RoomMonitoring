@@ -1,11 +1,9 @@
-﻿using Alef.RoomMonitoring.Service.Services;
+﻿using Alef.RoomMonitoring.Service.Services.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Alef.RoomMonitoring.Service.Services.Interfaces;
 
 namespace Alef.RoomMonitoring.Test.Services
 {
@@ -13,21 +11,18 @@ namespace Alef.RoomMonitoring.Test.Services
     public class CheckReservationServiceTest: TestBase
     {
 
+        private ICheckReservationService _service;
+
+        public CheckReservationServiceTest() {
+
+            _service = serviceProvider.GetService<ICheckReservationService>();
+
+        }
+
         [TestMethod]
-        public async Task TestCheck()
-        {
+        public void TestCheck() {
 
-            var service = serviceProvider.GetService<ICheckReservationService>();
-
-            try
-            {
-                service.CheckReservations();
-                Assert.IsTrue(true);
-            }
-            catch(Exception e)
-            {
-                throw e;
-            }
+            _service.CheckReservations();
 
         }
 

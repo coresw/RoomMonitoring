@@ -15,8 +15,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alef.RoomMonitoring.Configuration", "Alef.RoomMonitoring.Configuration\Alef.RoomMonitoring.Configuration.csproj", "{05C31679-BC06-4EB0-9546-13AC726595D3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CiscoEndpointProvider", "CiscoEndpointProvider\CiscoEndpointProvider.csproj", "{65BD8D88-BA2F-424A-AA16-7A16B3A70C2A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D9FE447B-76F5-469B-9D81-FBCC1DB664E2} = {D9FE447B-76F5-469B-9D81-FBCC1DB664E2}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alef.RoomMonitoring.Web", "Alef.RoomMonitoring.Web\Alef.RoomMonitoring.Web.csproj", "{2CBBB69D-8063-4C72-8377-7A0AE4A5DF91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alef.RoomMonitoring.Web", "Alef.RoomMonitoring.Web\Alef.RoomMonitoring.Web.csproj", "{2CBBB69D-8063-4C72-8377-7A0AE4A5DF91}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockEndpoint", "Alef.RoomMonitoring.RoomEndpoint\MockEndpoint.csproj", "{9C016909-D136-4C61-917B-5C78A49997DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +53,10 @@ Global
 		{2CBBB69D-8063-4C72-8377-7A0AE4A5DF91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CBBB69D-8063-4C72-8377-7A0AE4A5DF91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CBBB69D-8063-4C72-8377-7A0AE4A5DF91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C016909-D136-4C61-917B-5C78A49997DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C016909-D136-4C61-917B-5C78A49997DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C016909-D136-4C61-917B-5C78A49997DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C016909-D136-4C61-917B-5C78A49997DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -20,6 +20,36 @@ namespace Alef.RoomMonitoring.DAL.Services
             _graphAPI = graphAPI;
         }
 
+        public async Task SendMail(string from, string subject, string body, IEnumerable<string> to) {
+
+            string url = "users/" + from + "/sendMail";
+
+            JArray recipients = new JArray();
+
+            foreach (string address in to) {
+                JObject emailAddress = new JObject();
+                emailAddress.Add("address", address);
+                JObject recipient = new JObject();
+                recipient.Add("emailAddress", emailAddress);
+                recipients.Add(recipient);
+            }
+
+            JObject bodyJson = new JObject();
+            bodyJson.Add("contentType", new JValue("HTML"));
+            bodyJson.Add("content", new JValue(body));
+
+            JObject message = new JObject();
+            message.Add("subject", subject);
+            message.Add("body", bodyJson);
+            message.Add("toRecipients", recipients);
+
+            JObject json = new JObject();
+            json.Add("message", message);
+
+            await _graphAPI.PostAsync(url, json);
+
+        }
+
         public async Task<IEnumerable<OReservation>> GetUpcomingRoomReservations(string roomEmail)
         {
 
@@ -32,7 +62,7 @@ namespace Alef.RoomMonitoring.DAL.Services
                     DateTime.Today.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") +
                     "&enddatetime=" + DateTime.Today.AddDays(1).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
 
-                JArray roomReservs = (await _graphAPI.SendRequestAsync(query))["value"] as JArray;
+                JArray roomReservs = (await _graphAPI.GetAsync(query))["value"] as JArray;
 
                 foreach (JObject obj in roomReservs) 
                 {
@@ -42,7 +72,7 @@ namespace Alef.RoomMonitoring.DAL.Services
                         obj["organizer"]["emailAddress"]["address"] +
                         "/events?$filter=iCalUId eq '" + obj["iCalUId"]+"'";
 
-                    JObject reserv = (await _graphAPI.SendRequestAsync(reservQuery))["value"][0] as JObject;
+                    JObject reserv = (await _graphAPI.GetAsync(reservQuery))["value"][0] as JObject;
 
                     OUser organizer = new OUser { 
                         Name = reserv["organizer"]["emailAddress"]["name"].ToString(),

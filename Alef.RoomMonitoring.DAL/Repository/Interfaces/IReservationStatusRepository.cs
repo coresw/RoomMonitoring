@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Alef.RoomMonitoring.DAL.Repository.Interfaces
 {
-    public interface IPersonRepository : IBaseRepository<Person>
+    public interface IReservationStatusRepository : IBaseRepository<ReservationStatus>
     {
-        void Create(Person p);
+        void Create(ReservationStatus r);
     }
 }

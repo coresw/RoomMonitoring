@@ -47,7 +47,7 @@ namespace Alef.RoomMonitoring.DAL.Database
 
         }
 
-        public int Execute(string sql)
+        public int Execute(string cmd, object parameter = null)
         {
             try
             {
@@ -55,25 +55,25 @@ namespace Alef.RoomMonitoring.DAL.Database
                 var con = GetConnection();
                 lock (con)
                 {
-                    res = con.Execute(sql);
+                    res = con.Execute(cmd, parameter);
                 }
                 return res;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Demystify(), "Failed executing '" + sql + "': "+e.Message);
+                _logger.Error(e.Demystify(), "Failed executing '" + cmd + "': " + e.Message);
                 throw;
             }
         }
 
-        public IEnumerable<T> ExecuteQuery<T>(string sql)
+        public IEnumerable<T> ExecuteQuery<T>(string sql, object parameters = null)
         {
             try
             {
                 var con = GetConnection();
                 IEnumerable<T> res;
                 lock (con) {
-                    res = con.Query<T>(sql);
+                    res = con.Query<T>(sql, parameters);
                 }
                 return res;
             }
@@ -84,20 +84,21 @@ namespace Alef.RoomMonitoring.DAL.Database
             }
         }
 
-        public T ExecuteScalar<T>(string sql)
+        public T ExecuteScalar<T>(string cmd, object parameters = null)
         {
             try
             {
                 var con = GetConnection();
                 T res;
-                lock (con) {
-                    res = con.ExecuteScalar<T>(sql);
+                lock (con)
+                {
+                    res = con.ExecuteScalar<T>(cmd, parameters);
                 }
                 return res;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Demystify(), "Failed executing scalar '" + sql + "': "+e.Message);
+                _logger.Error(e.Demystify(), "Failed executing scalar '" + cmd + "': " + e.Message);
                 throw;
             }
         }

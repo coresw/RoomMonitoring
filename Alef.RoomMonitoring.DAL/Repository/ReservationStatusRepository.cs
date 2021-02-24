@@ -15,25 +15,21 @@ using System.Threading.Tasks;
 
 namespace Alef.RoomMonitoring.DAL.Repository
 {
-    public class ReservationRepository : BaseRepository<Reservation>, IReservationRepository
+    public class ReservationStatusRepository : BaseRepository<ReservationStatus>, IReservationStatusRepository
     {
 
-        public ReservationRepository(IDBProvider database) : base(database)
+        public ReservationStatusRepository(IDBProvider database) : base(database)
         {
 
-            TableName = "Reservation";
-            IdentityField = Reservation.ID;
+            TableName = "ReservationStatus";
+            IdentityField = ReservationStatus.ID;
             Fields = new string[] { 
-                Reservation.TOKEN, Reservation.CREATED, Reservation.MODIFIED, Reservation.NAME, Reservation.BODY,
-                Reservation.TIME_FROM, Reservation.TIME_TO, Reservation.ROOM_ID, Reservation.RESERVATION_STATUS_ID
+                ReservationStatus.NAME, ReservationStatus.DISPLAY
             };
 
         }
 
-        public void Create(Reservation r)
-        {
-            r.Id = base.Create<int>(r);
-        }
+        public void Create(ReservationStatus r) {}
 
     }
 }

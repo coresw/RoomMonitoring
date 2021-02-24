@@ -6,6 +6,7 @@ using Alef.RoomMonitoring.DAL.Repository;
 using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using Alef.RoomMonitoring.DAL.Services;
 using Alef.RoomMonitoring.DAL.Services.Interfaces;
+using Alef.RoomMonitoring.RoomEndpoint;
 using Alef.RoomMonitoring.Service.Services;
 using Alef.RoomMonitoring.Service.Services.Interfaces;
 using CiscoEndpointProvider;
@@ -29,8 +30,11 @@ namespace Alef.RoomMonitoring.Test
             services.AddSingleton<IDBProvider, DBProvider>();
             services.AddScoped<IPersonRepository, PersonRepository>();
             services.AddScoped<IAttendeeRepository, AttendeeRepository>();
+            services.AddScoped<IAttendeeTypeRepository, AttendeeTypeRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
+            services.AddScoped<IReservationStatusRepository, ReservationStatusRepository>();
+            services.AddScoped<IMockEndpointRepository, MockEndpointRepository>();
             
             services.AddScoped<IMSGraphAPI, MSGraphAPI>();
             services.AddSingleton<IMSGraphProvider, MSGraphProvider>();

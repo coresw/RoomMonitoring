@@ -8,9 +8,9 @@ namespace Alef.RoomMonitoring.DAL.Database.Interfaces
     public interface IDBProvider
     {
 
-        int Execute(string sql);
-        IEnumerable<T> ExecuteQuery<T>(string sql);
-        T ExecuteScalar<T>(string sql);
+        int Execute(string sql, object parameters = null);
+        IEnumerable<T> ExecuteQuery<T>(string sql, object parameters = null);
+        T ExecuteScalar<T>(string sql, object parameters = null);
         void Close();
 
     }

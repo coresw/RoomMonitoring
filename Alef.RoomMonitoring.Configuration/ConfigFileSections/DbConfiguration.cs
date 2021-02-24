@@ -16,7 +16,6 @@ namespace Alef.RoomMonitoring.Configuration.ConfigFileSections
         public string DbName { get; set; }
         public bool UseWindowsAuthentication { get; set; }
         public string ConfigTableName { get; set; }
-        public string DateFormat { get; set; }
 
         #region Public static methods
         //public static DbConfiguration Read(Config config)

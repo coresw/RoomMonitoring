@@ -21,21 +21,34 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (Reservation r in Model.ReservRepo.GetWhere(
-                 new NotEqualConstraint(Reservation.RESERVATION_STATUS_ID, ReservationStatus.CLOSED.Id))
-                ) {
-                <tr>
-                    <td>@r.Name</td>
-                    <td>@r.TimeFrom.ToLocalTime()</td>
-                    <td>@r.TimeTo.ToLocalTime()</td>
-                    <td>@((Model.RoomRepo.GetById(r.RoomId)).Name)</td>
-                    <td>@(Model.PersRepo.GetById(Model.AttendRepo.GetWhere(
+            @{ var list = Model.ReservRepo.GetWhere(
+                 new NotEqualConstraint(Reservation.RESERVATION_STATUS_ID,
+                    Model.ReservStatusRepo.GetByProperty(ReservationStatus.NAME, ReservationStatus.CLOSED).Id)
+                 ); }
+            @if (list.Count() > 0)
+            {
+                @foreach (Reservation r in list)
+                {
+                    <tr>
+                        <td>@r.Name</td>
+                        <td>@r.TimeFrom.ToLocalTime()</td>
+                        <td>@r.TimeTo.ToLocalTime()</td>
+                        <td>@((Model.RoomRepo.GetByProperty(Room.ID, r.RoomId)).Name)</td>
+                        <td>@(Model.PersRepo.GetByProperty(Person.ID, Model.AttendRepo.GetWhere(
                             new AndConstraint(
                                 new EqualConstraint(Attendee.RESERVATION_ID, r.Id),
-                                new EqualConstraint(Attendee.ATTENDEE_TYPE_ID, AttendeeType.ORGANIZER.Id)
+                                new EqualConstraint(Attendee.ATTENDEE_TYPE_ID,
+                                    Model.AttendTypeRepo.GetByProperty(AttendeeType.NAME, AttendeeType.ORGANIZER).Id)
                             )
                         ).First().PersonId).Name)</td>
-                    <td>@(ReservationStatus.GetById(r.ReservationStatusId).Display)</td>
+                        <td>@(Model.ReservStatusRepo.GetByProperty(ReservationStatus.ID, r.ReservationStatusId).Display)</td>
+                    </tr>
+                }
+            }
+            else
+            { 
+                <tr>
+                    <td colspan="6">No reservations found</td>
                 </tr>
             }
         </tbody>

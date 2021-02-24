@@ -3,12 +3,11 @@ using Alef.RoomMonitoring.DAL.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Alef.RoomMonitoring.DAL.Repository.Interfaces
 {
-    public interface IPersonRepository : IBaseRepository<Person>
+    public interface IMockEndpointRepository: IBaseRepository<MockEndpoint>
     {
-        void Create(Person p);
+        void Create(MockEndpoint e);
     }
 }

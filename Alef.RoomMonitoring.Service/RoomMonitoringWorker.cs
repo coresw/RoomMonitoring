@@ -7,6 +7,7 @@ using Alef.RoomMonitoring.DAL.Repository;
 using Alef.RoomMonitoring.DAL.Repository.Interfaces;
 using Alef.RoomMonitoring.DAL.Services;
 using Alef.RoomMonitoring.DAL.Services.Interfaces;
+using Alef.RoomMonitoring.RoomEndpoint;
 using Alef.RoomMonitoring.Service.ScheduledJobs;
 using Alef.RoomMonitoring.Service.ScheduledJobs.Interfaces;
 using Alef.RoomMonitoring.Service.Services;
@@ -161,6 +162,9 @@ namespace Alef.RoomMonitoring.Service
                 .AddSingleton<IRoomRepository, RoomRepository>()
                 .AddSingleton<IPersonRepository, PersonRepository>()
                 .AddSingleton<IAttendeeRepository, AttendeeRepository>()
+                .AddSingleton<IAttendeeTypeRepository, AttendeeTypeRepository>()
+                .AddSingleton<IReservationStatusRepository, ReservationStatusRepository>()
+                .AddSingleton<IMockEndpointRepository, MockEndpointRepository>()
 
                 .AddSingleton<ICheckReservationService, CheckReservationService>()
                 .AddSingleton<IReservationSyncService, ReservationSyncService>()

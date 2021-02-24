@@ -7,15 +7,8 @@ using System.Threading.Tasks;
 
 namespace Alef.RoomMonitoring.DAL.Repository.Interfaces
 {
-    public interface IReservationRepository 
+    public interface IReservationRepository : IBaseRepository<Reservation>
     {
         void Create(Reservation r);
-        Reservation GetById(int id);
-        Reservation GetByToken(string token);
-        IEnumerable<Reservation> GetAll();
-        IEnumerable<Reservation> GetWhere(IConstraint constraint);
-        void Update(Reservation r);
-        void Delete(Reservation r);
-        void DeleteWhere(IConstraint constraint);
     }
 }
